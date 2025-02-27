@@ -9,10 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.upsync.studybuddy",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
+        "googleServicesFile": "./google-services.json",
+        "package": "com.upsync.studybuddy",
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
@@ -32,8 +36,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics"
     ],
+    
     "experiments": {
       "typedRoutes": true
     }

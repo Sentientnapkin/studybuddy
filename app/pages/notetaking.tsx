@@ -9,7 +9,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Appearance,
   Button,
-  ColorSchemeName,
+  ColorSchemeName, Dimensions,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -25,6 +25,8 @@ import {actions, FONT_SIZE, getContentCSS, RichEditor, RichToolbar} from 'react-
 import {XMath} from '@wxik/core';
 import {InsertLinkModal} from '@/components/insertLink';
 import {EmojiView} from '@/components/Emoji';
+import {Link} from "expo-router";
+import {IconSymbol} from "@/components/ui/IconSymbol";
 
 type IconRecord = {
   selected: boolean;
@@ -75,7 +77,7 @@ function createContentStyle(theme: string) {
   return contentStyle;
 }
 
-export default function NoteTaking(props: IProps) {
+export default function NoteTakingScreen(props: IProps) {
   const {theme: initTheme = Appearance.getColorScheme(), navigation} = props;
   const richText = useRef<RichEditor>(null);
   const linkModal = useRef<RefLinkModal>();
@@ -273,16 +275,14 @@ export default function NoteTaking(props: IProps) {
         ref={scrollRef}
         nestedScrollEnabled={true}
         scrollEventThrottle={20}>
-        <RichToolbar
-          style={[styles.richBar, dark && styles.richBarDark]}
-          flatContainerStyle={styles.flatStyle}
-          editor={richText}
-          disabled={false}
-          selectedIconTint={'#2095F2'}
-          disabledIconTint={'#bfbfbf'}
-          onPressAddImage={onPressAddImage}
-          onInsertLink={onInsertLink}
-        />
+        <View className={"flex justify-between items-start bg-[#efefef] p-5"}>
+          <Link href={"/(tabs)"} className={"flex-row justify-items-center"} >
+            <IconSymbol name={"chevron.backward"} color={"black"} size={14}/>
+            <Text className={"text-xl"}>Back</Text>
+          </Link>
+
+
+        </View>
         <RichEditor
           // initialFocus={true}
           initialFocus={false}
@@ -325,24 +325,25 @@ export default function NoteTaking(props: IProps) {
           // iconSize={24}
           // iconGap={10}
           actions={[
+
             actions.undo,
             actions.redo,
-            actions.insertVideo,
+            actions.setBold,
+            actions.setItalic,
+            actions.setUnderline,
+            actions.indent,
+            actions.outdent,
+            actions.insertLink,
             actions.insertImage,
             actions.setStrikethrough,
-            // actions.checkboxList,
+            actions.insertBulletsList,
             actions.insertOrderedList,
             actions.blockquote,
             actions.alignLeft,
             actions.alignCenter,
             actions.alignRight,
             actions.code,
-            actions.line,
 
-            actions.foreColor,
-            actions.hiliteColor,
-            actions.heading1,
-            actions.heading4,
             'insertEmoji',
             'insertHTML',
             'fontSize',
@@ -370,6 +371,8 @@ export default function NoteTaking(props: IProps) {
   );
 }
 
+
+const ScreenHeight = Dimensions.get("window").height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -381,10 +384,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   rich: {
-    height: '100%',
+    height: ScreenHeight,
     flex: 1,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: '#e3e3e3',
   },
   topVi: {
     backgroundColor: '#fafafa',

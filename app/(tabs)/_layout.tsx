@@ -27,24 +27,24 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
+        name="recordings"
+        options={{
+          title: 'Recordings',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="recordingtape" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Notes',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="note.text" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="todoscreen"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="notetaking"
-        options={{
-          title: 'Note Taking',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="note" color={color} />,
+          title: 'Todos',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
         }}
       />
     </Tabs>

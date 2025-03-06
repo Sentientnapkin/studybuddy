@@ -1,6 +1,7 @@
 import {StyleSheet, Image, Platform, View, ScrollView, Button, TouchableOpacity, SafeAreaView} from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { router } from 'expo-router';
+import summarizeText from "@/scripts/summarizeText";
 
 interface TodoFormProps {
   title: String,
@@ -18,6 +19,15 @@ export default function NoteCard(props: TodoFormProps) {
     // write in code here that takes in the
 
     router.navigate("/pages/notetaking")
+  }
+
+  const summarizeNote = () => {
+
+    // pass in the string of the text to summarize
+    const summary = summarizeText("")
+
+    //upload the summary to firebase
+
   }
 
   return(

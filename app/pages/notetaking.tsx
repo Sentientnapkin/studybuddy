@@ -106,7 +106,6 @@ export default function NoteTakingScreen(props: IProps) {
   }, []);
 
   // theme change to editor color
-
   const onTheme = useCallback(() => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   }, [theme]);

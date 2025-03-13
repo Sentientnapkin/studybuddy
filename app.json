@@ -17,13 +17,15 @@
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
+      "package": "com.upsync.studybuddy",
       "adaptiveIcon": {
-        "googleServicesFile": "./google-services.json",
-        "package": "com.upsync.studybuddy",
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]

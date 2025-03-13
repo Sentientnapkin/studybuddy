@@ -40,7 +40,14 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
-      "expo-font"
+      "expo-font",
+      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow StudyBuddy to access your microphone."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

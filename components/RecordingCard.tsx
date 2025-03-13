@@ -1,4 +1,4 @@
-import React, {View, Text, Button} from "react-native";
+import React, {View, Text, Button, TouchableOpacity} from "react-native";
 import {useEffect, useState} from "react";
 import { Audio } from 'expo-av';
 
@@ -35,7 +35,7 @@ export default function RecordingCard(props : RecordingProps) {
   
   
   return (
-    <View className={"flex m-3 p-3"}>
+    <TouchableOpacity onPress={playSound} className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-8 m-4"}>
       <Text>
         {props.name}
       </Text>
@@ -43,8 +43,6 @@ export default function RecordingCard(props : RecordingProps) {
       <Text>
         {props.fileUrl}
       </Text>
-
-      <Button title="Play Sound" onPress={playSound} />
-    </View>
+    </TouchableOpacity>
   )
 }

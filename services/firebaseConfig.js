@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
+import { getFunctions } from 'firebase/functions';
 
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 const firebaseConfig = {

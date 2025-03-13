@@ -2,11 +2,18 @@ import { useState } from 'react';
 import {View, StyleSheet, TouchableOpacity, SafeAreaView, Image} from 'react-native';
 import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import {getApp} from "firebase/app";
 
 export default function App() {
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isRecording, setIsRecording] = useState(false)
+
+  const app = getApp();
+  const functions = getFunctions(app);
+  // todo change function name
+  const addRecording = httpsCallable(functions, 'addRecording');
 
   async function startRecording() {
     try {
@@ -46,6 +53,14 @@ export default function App() {
     const uri = recording.getURI();
 
     // todo call the api to upload the uri and see if that works for playing the video
+    addRecording({ uri: uri })
+      .then((result) => {
+        // Read result of the Cloud Function.
+        /** @type {any} */
+        const data = result.data;
+        //@ts-ignore
+        const sanitizedMessage = data.text;
+      });
 
     setIsRecording(false);
 

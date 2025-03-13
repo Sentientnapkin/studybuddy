@@ -22,6 +22,8 @@ import Task from "@/components/Task";
 import Modal from "react-native-modal";
 import {set} from "@firebase/database";
 import {Link} from "expo-router";
+import {getFunctions, httpsCallable} from "firebase/functions";
+import {getApp} from "firebase/app";
 
 interface task {
   name: string,
@@ -33,6 +35,11 @@ export default function TodoScreen() {
   const [newTodoName, setNewTodoName] = useState("")
   const [newTodoDesc, setNewTodoDesc] = useState("")
   const [modalVisible, setModalVisible] = useState(false)
+
+  const app = getApp();
+  const functions = getFunctions(app);
+  const getTodos = httpsCallable(functions, 'getTodos');
+  const addTodoFunction = httpsCallable(functions, 'addTodo');
 
   const showModal = () => {
     setModalVisible(true)
@@ -46,6 +53,14 @@ export default function TodoScreen() {
     // add code to call the cloud function to add a todo here
     const newTodo = {name: "", description: ""}
 
+    addTodoFunction(newTodo)
+      .then((result) => {
+        // Read result of the Cloud Function.
+        /** @type {any} */
+        const data = result.data;
+        // const sanitizedMessage = data.text;
+      })
+
     setTodos([...todos, newTodo])
     setNewTodoName("")
     setNewTodoDesc("")
@@ -55,6 +70,16 @@ export default function TodoScreen() {
 
   useEffect(() => {
     // call the api to get the notes onto this screen
+    getTodos({})
+      .then((result) => {
+        // Read result of the Cloud Function.
+        /** @type {any} */
+        const data = result.data;
+        // const sanitizedMessage = data.text;
+
+        // @ts-ignore
+        setTodos(data);
+      });
 
     setTodos([]);
   }, [])

@@ -27,6 +27,9 @@ import {InsertLinkModal} from '@/components/insertLink';
 import {EmojiView} from '@/components/Emoji';
 import {Link} from "expo-router";
 import {IconSymbol} from "@/components/ui/IconSymbol";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import {getApp} from "firebase/app";
+
 
 type IconRecord = {
   selected: boolean;
@@ -90,8 +93,21 @@ export default function NoteTakingScreen(props: IProps) {
   const [disabled, setDisable] = useState(false);
   const contentStyle = useMemo(() => createContentStyle(theme), [theme]);
 
+  const app = getApp();
+  const functions = getFunctions(app);
+  // todo change function name
+  const addNote = httpsCallable(functions, 'addNote');
+
   // on save to preview
   const handleSave = useCallback(() => {
+    addNote({ note: contentRef.current })
+      .then((result) => {
+        // Read result of the Cloud Function.
+        /** @type {any} */
+        const data = result.data;
+        // @ts-ignore
+        const sanitizedMessage = data.text;
+      });
     navigation.push('preview', {html: contentRef.current, css: getContentCSS()});
   }, [navigation]);
 

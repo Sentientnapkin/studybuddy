@@ -20,7 +20,7 @@ export default function HomeScreen() {
     // call the api to get the notes onto this screen
 
     setNotes([]);
-  })
+  }, [])
 
   return (
     <SafeAreaView className={"flex h-screen-safe justify-center"}>

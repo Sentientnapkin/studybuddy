@@ -30,7 +30,7 @@ export default function RecordingsScreen() {
     // call the api to get the notes onto this screen
 
     setRecordings([]);
-  })
+  }, [])
 
   return (
     <SafeAreaView className={"flex h-screen-safe justify-center"}>

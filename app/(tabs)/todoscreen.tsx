@@ -44,7 +44,7 @@ export default function TodoScreen() {
     // call the api to get the notes onto this screen
 
     setTodos([]);
-  })
+  }, [])
 
   return (
     <SafeAreaView>

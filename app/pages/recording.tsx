@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {View, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, SafeAreaView, Image} from 'react-native';
 import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
 
@@ -25,6 +25,7 @@ export default function App() {
       );
       // @ts-ignore
       setRecording(recording);
+      setIsRecording(true);
       console.log('Recording started');
     } catch (err) {
       console.error('Failed to start recording', err);
@@ -43,33 +44,29 @@ export default function App() {
     );
     // @ts-ignore
     const uri = recording.getURI();
+
+    // todo call the api to upload the uri and see if that works for playing the video
+
+    setIsRecording(false);
+
     console.log('Recording stopped and stored at', uri);
   }
 
 
   return(
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className={"flex justify-center items-center bg-[#ecf0f1] p-10 h-screen-safe"}>
         <TouchableOpacity
-          onPress={recording ? stopRecording : startRecording}
+          onPress={isRecording ? stopRecording : startRecording}
         >
           {isRecording &&
-              <IconSymbol size={28} name="record.circle.fill" color={"red"} />
+              <IconSymbol size={100} name="record.circle.fill" color={"red"} />
           }
 
           {!isRecording &&
-              <IconSymbol size={28} name="record.circle.fill" color={"black"} />
+              <IconSymbol size={100} name="record.circle.fill" color={"black"} />
           }
 
         </TouchableOpacity>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
-    padding: 10,
-  },
-});

@@ -3,8 +3,9 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import {Link} from "expo-router";
 import {useEffect, useState} from "react";
 import NoteCard from "@/components/NoteCard";
-import { getApp } from 'firebase/app';
+import { getApp, initializeApp, getApps } from 'firebase/app';
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { firebaseConfig } from "@/services/firebaseConfig";
 
 type Note = {
   title: String,
@@ -17,7 +18,7 @@ export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([])
   const [editing, setEditing] = useState(false)
 
-  const app = getApp();
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   const functions = getFunctions(app);
   const getNotes = httpsCallable(functions, 'getNotes');
 

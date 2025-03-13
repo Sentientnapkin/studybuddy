@@ -1,5 +1,5 @@
-import { getApp } from '@react-native-firebase/app';
-import { getVertexAI, getGenerativeModel } from '@react-native-firebase/vertexai';
+import { getApp } from 'firebase/app';
+import { getVertexAI, getGenerativeModel } from "firebase/vertexai";
 
 export default async function summarizeText(noteToSummarize : string) {
   const app = getApp();

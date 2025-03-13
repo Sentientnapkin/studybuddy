@@ -1,39 +1,56 @@
-import React, {SafeAreaView, TouchableOpacity, StyleSheet, Alert} from 'react-native';
-import { useState, useEffect } from 'react';
-import { useAudioRecorder, RecordingOptions, AudioModule, RecordingPresets } from 'expo-audio';
+import { useState } from 'react';
+import {View, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
 
-
-export default function RecordingScreen() {
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+export default function App() {
+  const [recording, setRecording] = useState();
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isRecording, setIsRecording] = useState(false)
 
-  const record = async () => {
-    await audioRecorder.prepareToRecordAsync();
-    audioRecorder.record();
-  };
-
-  const stopRecording = async () => {
-    // The recording will be available on `audioRecorder.uri`.
-    // write code to upload the uri to firebase
-
-    await audioRecorder.stop();
-  };
-
-  useEffect(() => {
-    (async () => {
-      const status = await AudioModule.requestRecordingPermissionsAsync();
-      if (!status.granted) {
-        Alert.alert('Permission to access microphone was denied');
+  async function startRecording() {
+    try {
+      // @ts-ignore
+      if (permissionResponse.status !== 'granted') {
+        console.log('Requesting permission..');
+        await requestPermission();
       }
-    })();
-  }, []);
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      console.log('Starting recording..');
+      const { recording } = await Audio.Recording.createAsync( Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      // @ts-ignore
+      setRecording(recording);
+      console.log('Recording started');
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  }
+
+  async function stopRecording() {
+    console.log('Stopping recording..');
+    setRecording(undefined);
+    // @ts-ignore
+    await recording.stopAndUnloadAsync();
+    await Audio.setAudioModeAsync(
+      {
+        allowsRecordingIOS: false,
+      }
+    );
+    // @ts-ignore
+    const uri = recording.getURI();
+    console.log('Recording stopped and stored at', uri);
+  }
 
 
   return(
     <SafeAreaView style={styles.container}>
         <TouchableOpacity
-          onPress={audioRecorder.isRecording ? stopRecording : record}
+          onPress={recording ? stopRecording : startRecording}
         >
           {isRecording &&
               <IconSymbol size={28} name="record.circle.fill" color={"red"} />

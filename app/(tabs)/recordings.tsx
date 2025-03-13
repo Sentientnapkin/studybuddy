@@ -1,25 +1,11 @@
 import {
-  StyleSheet,
-  Image,
-  Platform,
-  View,
   ScrollView,
   SafeAreaView,
-  Button,
   TouchableOpacity,
-  TextInput
 } from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import {useEffect, useState} from "react";
-import Task from "@/components/Task";
-import Modal from "react-native-modal";
-import {set} from "@firebase/database";
 import RecordingCard from "@/components/RecordingCard";
 import {Link} from "expo-router";
 

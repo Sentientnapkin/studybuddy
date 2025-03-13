@@ -1,5 +1,4 @@
 import React, {View, Text, Button} from "react-native";
-import { useAudioPlayer } from 'expo-audio';
 
 
 interface RecordingProps {
@@ -7,7 +6,6 @@ interface RecordingProps {
   fileUrl: string,
 }
 export default function RecordingCard(props : RecordingProps) {
-  const player = useAudioPlayer(require(props.fileUrl));
 
   return (
     <View className={"flex m-3 p-3"}>
@@ -19,7 +17,7 @@ export default function RecordingCard(props : RecordingProps) {
         {props.fileUrl}
       </Text>
 
-      <Button title="Play Sound" onPress={() => player.play()} />
+      <Button title="Play Sound" onPress={() => {}} />
     </View>
   )
 }

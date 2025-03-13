@@ -30,9 +30,17 @@ yarn-error.*
 *.pem
 
 # local env files
+.env*
 .env*.local
 
 # typescript
 *.tsbuildinfo
+
+# Firebase Emulator & Debug Logs
+firebase-debug.log
+firebase-debug.*.log
+
+# Python Virtual Environment (For Firebase Cloud Functions)
+functions/venv/
 
 app-example

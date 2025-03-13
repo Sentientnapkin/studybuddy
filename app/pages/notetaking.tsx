@@ -1,10 +1,3 @@
-/* eslint-disable react/no-unstable-nested-components,react-native/no-inline-styles*/
-/**
- * Rich Editor Example
- * @deprecated Please refer to example.hooks.js
- * @author wxik
- * @since 2019-06-24 14:52
- */
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Appearance,
@@ -29,7 +22,6 @@ import {Link} from "expo-router";
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
-
 
 type IconRecord = {
   selected: boolean;
@@ -100,6 +92,7 @@ export default function NoteTakingScreen(props: IProps) {
 
   // on save to preview
   const handleSave = useCallback(() => {
+
     addNote({ note: contentRef.current })
       .then((result) => {
         // Read result of the Cloud Function.

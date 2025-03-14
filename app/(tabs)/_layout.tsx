@@ -30,6 +30,7 @@ export default function TabLayout() {
         name="recordings"
         options={{
           title: 'Recordings',
+          headerShown: true,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="recordingtape" color={color} />,
         }}
       />

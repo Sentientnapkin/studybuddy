@@ -4,16 +4,17 @@ import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
+import * as FileSystem from 'expo-file-system';
 
 export default function App() {
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isRecording, setIsRecording] = useState(false)
+  const [name, setName] = useState("default recording name")
 
   const app = getApp();
   const functions = getFunctions(app);
-  // todo change function name
-  const addRecording = httpsCallable(functions, 'addRecording');
+  const addRecording = httpsCallable(functions, 'store_audio_metadata');
 
   async function startRecording() {
     try {
@@ -51,14 +52,19 @@ export default function App() {
     // @ts-ignore
     const uri = recording.getURI();
 
-    // todo call the api to upload the uri and see if that works for playing the video
-    addRecording({ uri: uri })
+    const base64Data = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64
+    });
+
+    // Get file extension from URI
+    const fileExtension = uri.split('.').pop();
+
+    addRecording({
+      fileName: `${name || Date.now()}.${fileExtension}`,
+      audioData: base64Data
+    })
       .then((result) => {
-        // Read result of the Cloud Function.
-        /** @type {any} */
-        const data = result.data;
-        //@ts-ignore
-        const sanitizedMessage = data.text;
+        console.log(result.data);
       });
 
     setIsRecording(false);

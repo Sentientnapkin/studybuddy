@@ -4,30 +4,29 @@
 #from firebase_functions import firestore_fn, https_fn
 import firebase_admin
 from firebase_admin import initialize_app, firestore, storage, credentials
+from firebase_functions import firestore_fn, https_fn, options
 import google.cloud.firestore
 from flask import Flask, request, jsonify
+from typing import Any
+import base64
 import os
 
 # Initialize Firebase Admin SDK
-initialize_app()
+app = initialize_app()
 
 # Firestore Database Instance
 db = firestore.client()
 
-# Create Flask app 
-app = Flask(__name__)
-
 # Firebase Storage bucket 
-bucket = storage.bucket("studybuddy-d4472.appspot.com")
+bucket = storage.bucket("studybuddy-d4472.firebasestorage.app")
 
 # Cloud Function that takes in Note File and adds file to Firebase Storage and Firestore
-@app.route('/upload_html_note', methods=['POST'])
-def upload_note():
+@https_fn.on_call()
+def upload_note(req: https_fn.CallableRequest) -> Any:
 
     # Extracting HTML String
-    data = request.get_json()
-    html_content = data.get("htmlString") 
-    file_name = data.get("fileName", f"note_{int(os.time())}.html") 
+    html_content = req.data["note"]
+    file_name = req.data["fileName"]
     
     # Saving HTML String as temp File
     temp_file_path = os.path.join("/tmp", file_name)
@@ -37,83 +36,67 @@ def upload_note():
     #stores temporary file in Notes folder in bucket (Firebase Storage)
     blob = bucket.blob(f"Notes/{file_name}") 
     blob.upload_from_filename(temp_file_path, content_type="text/html")
+    blob.make_public()
 
-    #signed url (temp) CAN BE REMOVED 
-    signed_url = blob.generate_signed_url(expiration=3600)
+    public_url = blob.public_url
 
     #removes temp file
     os.remove(temp_file_path)
 
     # Uploading MetaData to FireStore
     doc_ref = db.collection("notes").add({
-            "name": file.filename,
-            "fileUrl": signed_url,
+            "name": file_name,
+            "fileUrl": public_url,
             "createdAt": firestore.SERVER_TIMESTAMP,
         })
     
     # Return success message
-    return jsonify({"message": "File uploaded successfully", "url": blob.public_url, "id": doc_ref[1].id})
+    return {"message": "File uploaded successfully", "url": blob.public_url, "id": doc_ref[1].id}, 200
 
 # Cloud Function to Handle Audio Metadata (Firestore) and Cloud Storage (Firebase)
-@app.route('/store_audio_metadata', methods=['POST'])
-def store_audio_metadata():
-        if 'file' not in request.files:
-            return jsonify({"error": "No file provided"}), 400
+@https_fn.on_call()
+def store_audio_metadata(req: https_fn.CallableRequest) -> Any:
+        fileName = req.data['fileName']
+        audio_bytes = base64.b64decode(req.data['audioData'])
 
-        file = request.files['file']
-
-        if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
-
-        # Temp file
-        temp_file_path = os.path.join('/tmp', file.filename)
-        file.save(temp_file_path)
+        if fileName == '':
+            return {"error": "No selected file"}, 400
 
         # Upload to Firebase Storage Recordings Folder
-        blob = bucket.blob(f"Recordings/{file.filename}")
-        blob.upload_from_filename(temp_file_path, content_type="audio/mp4")  # Set to mp4 for M4A Audio File Type
+        blob = bucket.blob(f"Recordings/{fileName}")
+        blob.upload_from_string(audio_bytes, content_type='audio/mp4')
+        blob.make_public()
 
-        # temp signed url CAN BE REMOVED
-        signed_url = blob.generate_signed_url(expiration=3600)
-
-        # delete temp file
-        os.remove(temp_file_path)
+        public_url = blob.public_url
 
         # Store Metadata in Firestore
         doc_ref = db.collection("audioRecordings").add({
-            "name": file.filename,
-            "fileUrl": signed_url,
+            "name": fileName,
+            "fileUrl": public_url,
             "createdAt": firestore.SERVER_TIMESTAMP,
         })
 
         #Success Message
-        return jsonify({
-            "message": "Audio uploaded successfully",
-            "url": signed_url,
-            "id": doc_ref[1].id
-        }), 200
+        return {"message": "Audio uploaded successfully", "url": public_url, "id": doc_ref[1].id}, 200
 
 # Cloud Function to Store To-Do List Items in Firestore (NO Firebase Storage)
-@app.route('/add_todo', methods=['POST'])
-def add_todo():
+@https_fn.on_call()
+def add_todo(req: https_fn.CallableRequest) -> Any:
     
     # JSON File Check
-    data = request.get_json()
-    title = data.get("title")
-    description = data.get("description")
+    title = req.data["name"]
+    description = req.data["description"]
+
+    print(title, description)
 
     if not title or not description:
         return jsonify({"error": "Missing title or description"}), 400
 
     # Save to Firestore
-    doc_ref = db.collection("toDoList").add({
+    doc_ref = db.collection("Todos").add({
         "title": title,
         "description": description,
         "createdAt": firestore.SERVER_TIMESTAMP,
     })
 
-    return jsonify({"success": True, "id": doc_ref[1].id}), 200
-
-# Run Flask App (for local testing)
-if __name__ == '__main__':
-    app.run(port=5000)
+    return {"success": True, "id": doc_ref[1].id}, 200

@@ -55,7 +55,7 @@ export default function RecordingsScreen() {
           )
         )}
       </ScrollView>
-      <Link href={"/pages/recording"} className={"absolute bottom-0 right-0 p-10"}>
+      <Link href={"/pages/recording"} className={"absolute bottom-20 right-0 p-10"}>
         <TouchableOpacity className={""} onPress={() => {}}>
           <IconSymbol size={52} name={"record.circle"} color={"red"}/>
         </TouchableOpacity>

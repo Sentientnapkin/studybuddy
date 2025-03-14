@@ -15,7 +15,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        headerShown: true,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
@@ -30,7 +30,6 @@ export default function TabLayout() {
         name="recordings"
         options={{
           title: 'Recordings',
-          headerShown: true,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="recordingtape" color={color} />,
         }}
       />

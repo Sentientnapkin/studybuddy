@@ -14,9 +14,9 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
+      "package": "com.upsync.studybuddy",
       "adaptiveIcon": {
-        "googleServicesFile": "./google-services.json",
-        "package": "com.upsync.studybuddy",
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
@@ -37,11 +37,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
-      "@react-native-firebase/crashlytics",
       "expo-font",
-      "expo-audio"
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow StudyBuddy to access your microphone."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

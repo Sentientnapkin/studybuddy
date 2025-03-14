@@ -36,10 +36,9 @@ export default function TodoScreen() {
   const [newTodoDesc, setNewTodoDesc] = useState("")
   const [modalVisible, setModalVisible] = useState(false)
 
-  const app = getApp();
-  const functions = getFunctions(app);
+  const functions = getFunctions();
   const getTodos = httpsCallable(functions, 'getTodos');
-  const addTodoFunction = httpsCallable(functions, 'addTodo');
+  const addTodoFunction = httpsCallable(functions, 'add_todo');
 
   const showModal = () => {
     setModalVisible(true)
@@ -50,18 +49,13 @@ export default function TodoScreen() {
   }
 
   const addTodo = () => {
-    // add code to call the cloud function to add a todo here
-    const newTodo = {name: "", description: ""}
+    const newTodo = {name: newTodoName, description: newTodoDesc}
 
     addTodoFunction(newTodo)
       .then((result) => {
-        // Read result of the Cloud Function.
-        /** @type {any} */
-        const data = result.data;
-        // const sanitizedMessage = data.text;
+        console.log(result.data)
       })
 
-    setTodos([...todos, newTodo])
     setNewTodoName("")
     setNewTodoDesc("")
 
@@ -69,6 +63,7 @@ export default function TodoScreen() {
   }
 
   useEffect(() => {
+
     // call the api to get the notes onto this screen
     getTodos({})
       .then((result) => {
@@ -123,12 +118,12 @@ export default function TodoScreen() {
       <ScrollView>
         {todos.map(
           (item) => (
-            <Task name={item.name} description={item.description}/>
+            <Task name={item.name} description={item.description} key={item.name}/>
           )
         )}
       </ScrollView>
 
-      <View className={"absolute bottom-0 right-0 p-10"}>
+      <View className={"absolute bottom-20 right-0 p-10"}>
         <TouchableOpacity className={""} onPress={showModal}>
           <IconSymbol size={52} name={"plus.circle.fill"} color={"green"}/>
         </TouchableOpacity>

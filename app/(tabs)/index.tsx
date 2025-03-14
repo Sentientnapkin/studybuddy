@@ -45,7 +45,7 @@ export default function HomeScreen() {
           )
         )}
       </ScrollView>
-      <Link href={"/pages/notetaking"} className={"absolute bottom-0 right-0 p-10"}>
+      <Link href={"/pages/notetaking"} className={"absolute bottom-20 right-0 p-10"}>
         <TouchableOpacity className={""}>
           <IconSymbol size={52} name={"square.and.pencil"} color={"white"}/>
         </TouchableOpacity>

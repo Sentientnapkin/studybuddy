@@ -1,2 +1,4 @@
 firebase-admin
 flask
+firebase_functions
+google.cloud.firestore

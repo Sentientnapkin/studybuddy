@@ -19,7 +19,8 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 // Initialize Cloud Storage and get a reference to the service
 const db = getFirestore(app);
 const storage = getStorage(app);
+const functions = getFunctions(app);
 
-export {firebaseConfig, app, db, storage};
+export {firebaseConfig, app, db, storage, functions};
 
  

@@ -11,17 +11,18 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
+  TextInput, TouchableOpacity,
   View,
 } from 'react-native';
 import {actions, FONT_SIZE, getContentCSS, RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
 import {XMath} from '@wxik/core';
 import {InsertLinkModal} from '@/components/insertLink';
 import {EmojiView} from '@/components/Emoji';
-import {Link} from "expo-router";
+import {Link, router} from "expo-router";
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
+import {saveSnapshot} from "react-native-reanimated/lib/typescript/layoutReanimation/web";
 
 type IconRecord = {
   selected: boolean;
@@ -80,6 +81,8 @@ export default function NoteTakingScreen(props: IProps) {
   // save on html
   const contentRef = useRef(initHTML);
 
+  const [name, setName] = useState("default_note_name");
+
   const [theme, setTheme] = useState("light");
   const [emojiVisible, setEmojiVisible] = useState(false);
   const [disabled, setDisable] = useState(false);
@@ -88,20 +91,17 @@ export default function NoteTakingScreen(props: IProps) {
   const app = getApp();
   const functions = getFunctions(app);
   // todo change function name
-  const addNote = httpsCallable(functions, 'addNote');
+  const addNote = httpsCallable(functions, 'upload_note');
 
   // on save to preview
   const handleSave = useCallback(() => {
-
-    addNote({ note: contentRef.current })
+    addNote({ fileName: `${name}.html`, note: contentRef.current })
       .then((result) => {
         // Read result of the Cloud Function.
         /** @type {any} */
-        const data = result.data;
-        // @ts-ignore
-        const sanitizedMessage = data.text;
+        console.log(result.data);
+        router.push("/(tabs)")
       });
-    navigation.push('preview', {html: contentRef.current, css: getContentCSS()});
   }, [navigation]);
 
   const handleHome = useCallback(() => {
@@ -283,11 +283,17 @@ export default function NoteTakingScreen(props: IProps) {
         ref={scrollRef}
         nestedScrollEnabled={true}
         scrollEventThrottle={20}>
-        <View className={"flex justify-between items-start bg-[#efefef] p-5"}>
+        <View className={"flex justify-between items-start bg-[#efefef] p-5 flex-row"}>
           <Link href={"/(tabs)"} className={"flex-row justify-items-center"} >
             <IconSymbol name={"chevron.backward"} color={"black"} size={14}/>
             <Text className={"text-xl"}>Back</Text>
           </Link>
+
+          <TouchableOpacity onPress={handleSave} className={"flex-row justify-items-center"}>
+            <Text className={"text-xl"}>
+              Save
+            </Text>
+          </TouchableOpacity>
 
 
         </View>

@@ -1,13 +1,29 @@
-import React, {View, Text} from "react-native";
+import React, {View, Text, TouchableOpacity} from "react-native";
+import {getApp} from "firebase/app";
+import {getFunctions, httpsCallable} from "firebase/functions";
+import {IconSymbol} from "@/components/ui/IconSymbol";
+import {Dispatch, SetStateAction} from "react";
 
 interface TaskProps {
   name: string,
   description: string,
+  key: string,
+  id: string,
+  setChanged: Dispatch<SetStateAction<boolean>>,
 }
 export default function Task(props : TaskProps) {
-  const finishTask = () => {
-    // run API here to delete this note
+  const app = getApp();
+  const functions = getFunctions(app);
+  const deleteTodo = httpsCallable(functions, 'delete_todo');
 
+
+  const finishTask = () => {
+    deleteTodo({id: props.id}).then(
+      (response) => {
+        console.log(response.data)
+        props.setChanged(true)
+      }
+    )
 
   }
 
@@ -21,6 +37,10 @@ export default function Task(props : TaskProps) {
       <Text>
         {props.description}
       </Text>
+
+      <TouchableOpacity onPress={finishTask}>
+        <IconSymbol size={28} name={"trash.fill"} color={"black"}/>
+      </TouchableOpacity>
     </View>
   )
 }

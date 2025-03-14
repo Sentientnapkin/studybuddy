@@ -18,11 +18,15 @@ import {actions, FONT_SIZE, getContentCSS, RichEditor, RichToolbar} from 'react-
 import {XMath} from '@wxik/core';
 import {InsertLinkModal} from '@/components/insertLink';
 import {EmojiView} from '@/components/Emoji';
-import {Link, router} from "expo-router";
+import {Link, router, useLocalSearchParams} from "expo-router";
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
 import {saveSnapshot} from "react-native-reanimated/lib/typescript/layoutReanimation/web";
+import {doc, getFirestore, updateDoc} from "firebase/firestore";
+import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
+import * as url from "node:url";
 
 type IconRecord = {
   selected: boolean;
@@ -34,6 +38,8 @@ type IconRecord = {
 interface IProps {
   navigation: INavigation;
   theme?: ColorSchemeName;
+  id: string,
+  data: string,
 }
 
 interface INavigation {
@@ -50,7 +56,6 @@ const imageList = [
   'https://img.lesmao.vip/k/h256/R/MeiTu/1297.jpg',
   'https://img.lesmao.vip/k/h256/R/MeiTu/1292.jpg',
 ];
-const initHTML = ``;
 
 const phizIcon = require('../../assets/images/icon.png');
 const htmlIcon = require('../../assets/images/html.png');
@@ -75,13 +80,16 @@ function createContentStyle(theme: string) {
 
 export default function NoteTakingScreen(props: IProps) {
   const {theme: initTheme = Appearance.getColorScheme(), navigation} = props;
+  const {id, data, previousName} = useLocalSearchParams();
+
+  const initHTML = (data == undefined) ? `` : data;
+  const contentRef = useRef(initHTML);
+
   const richText = useRef<RichEditor>(null);
   const linkModal = useRef<RefLinkModal>();
   const scrollRef = useRef<ScrollView>(null);
   // save on html
-  const contentRef = useRef(initHTML);
-
-  const [name, setName] = useState("default_note_name");
+  const [name, setName] = useState("");
 
   const [theme, setTheme] = useState("light");
   const [emojiVisible, setEmojiVisible] = useState(false);
@@ -90,18 +98,37 @@ export default function NoteTakingScreen(props: IProps) {
 
   const app = getApp();
   const functions = getFunctions(app);
-  // todo change function name
   const addNote = httpsCallable(functions, 'upload_note');
+  const addBlob = httpsCallable(functions, 'upload_generic_note');
+  const db = getFirestore(app)
 
   // on save to preview
-  const handleSave = useCallback(() => {
-    addNote({ fileName: `${name}.html`, note: contentRef.current })
-      .then((result) => {
-        // Read result of the Cloud Function.
-        /** @type {any} */
-        console.log(result.data);
-        router.push("/(tabs)")
-      });
+  const handleSave = useCallback(async () => {
+    if (id == undefined) {
+      addNote({ fileName: `${name}.html`, note: contentRef.current })
+        .then((result) => {
+          // Read result of the Cloud Function.
+          /** @type {any} */
+          console.log(result.data);
+          router.push("/(tabs)")
+        });
+    } else {
+      const noteRef = doc(db, "notes", id);
+
+      addBlob({ fileName: `${previousName}.html`, note: contentRef.current })
+        .then(async (result) => {
+          // Read result of the Cloud Function.
+          /** @type {any} */
+          console.log(result.data);
+
+          await updateDoc(noteRef, {
+            name: name,
+            fileUrl: result.data[0].url,
+          })
+
+          router.push("/(tabs)")
+        });
+    }
   }, [navigation]);
 
   const handleHome = useCallback(() => {
@@ -288,6 +315,15 @@ export default function NoteTakingScreen(props: IProps) {
             <IconSymbol name={"chevron.backward"} color={"black"} size={14}/>
             <Text className={"text-xl"}>Back</Text>
           </Link>
+
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            placeholder={"Set Name Here"}
+            placeholderTextColor={"black"}
+          >
+
+          </TextInput>
 
           <TouchableOpacity onPress={handleSave} className={"flex-row justify-items-center"}>
             <Text className={"text-xl"}>

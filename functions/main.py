@@ -9,6 +9,8 @@ import google.cloud.firestore
 from flask import Flask, request, jsonify
 from typing import Any
 import base64
+import uuid
+import json
 import os
 
 # Initialize Firebase Admin SDK
@@ -34,7 +36,7 @@ def upload_note(req: https_fn.CallableRequest) -> Any:
         file.write(html_content)
 
     #stores temporary file in Notes folder in bucket (Firebase Storage)
-    blob = bucket.blob(f"Notes/{file_name}") 
+    blob = bucket.blob(f"Notes/{uuid.uuid4()}")
     blob.upload_from_filename(temp_file_path, content_type="text/html")
     blob.make_public()
 
@@ -47,11 +49,36 @@ def upload_note(req: https_fn.CallableRequest) -> Any:
     doc_ref = db.collection("notes").add({
             "name": file_name,
             "fileUrl": public_url,
+            "summary": "",
             "createdAt": firestore.SERVER_TIMESTAMP,
         })
     
     # Return success message
     return {"message": "File uploaded successfully", "url": blob.public_url, "id": doc_ref[1].id}, 200
+
+@https_fn.on_call()
+def get_notes(req: https_fn.CallableRequest) -> Any:
+    todo_ref = db.collection("notes")
+    docs = todo_ref.stream()
+
+    data = []
+
+    for doc in docs:
+        data.append({
+                        "id": doc.id,
+                        **doc.to_dict()
+                    })
+
+    return {"success": True, "data": data}, 200
+
+@https_fn.on_call()
+def delete_note(req: https_fn.CallableRequest) -> Any:
+    document_id = req.data["id"]
+
+    todo = db.collection("notes").document(document_id)
+    todo.delete()
+
+    return {"success": True}, 200
 
 # Cloud Function to Handle Audio Metadata (Firestore) and Cloud Storage (Firebase)
 @https_fn.on_call()
@@ -63,7 +90,7 @@ def store_audio_metadata(req: https_fn.CallableRequest) -> Any:
             return {"error": "No selected file"}, 400
 
         # Upload to Firebase Storage Recordings Folder
-        blob = bucket.blob(f"Recordings/{fileName}")
+        blob = bucket.blob(f"Recordings/{uuid.uuid4()}")
         blob.upload_from_string(audio_bytes, content_type='audio/mp4')
         blob.make_public()
 
@@ -73,11 +100,37 @@ def store_audio_metadata(req: https_fn.CallableRequest) -> Any:
         doc_ref = db.collection("audioRecordings").add({
             "name": fileName,
             "fileUrl": public_url,
+            "transcription": "",
             "createdAt": firestore.SERVER_TIMESTAMP,
         })
 
         #Success Message
         return {"message": "Audio uploaded successfully", "url": public_url, "id": doc_ref[1].id}, 200
+
+@https_fn.on_call()
+def get_audios(req: https_fn.CallableRequest) -> Any:
+    todo_ref = db.collection("audioRecordings")
+    docs = todo_ref.stream()
+
+    data = []
+
+    for doc in docs:
+        data.append({
+                        "id": doc.id,
+                        **doc.to_dict()
+                    })
+
+    return {"success": True, "data": data}, 200
+
+
+@https_fn.on_call()
+def delete_recording(req: https_fn.CallableRequest) -> Any:
+    document_id = req.data["id"]
+
+    todo = db.collection("audioRecordings").document(document_id)
+    todo.delete()
+
+    return {"success": True}, 200
 
 # Cloud Function to Store To-Do List Items in Firestore (NO Firebase Storage)
 @https_fn.on_call()
@@ -87,9 +140,7 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
     title = req.data["name"]
     description = req.data["description"]
 
-    print(title, description)
-
-    if not title or not description:
+    if not title:
         return jsonify({"error": "Missing title or description"}), 400
 
     # Save to Firestore
@@ -100,3 +151,55 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
     })
 
     return {"success": True, "id": doc_ref[1].id}, 200
+
+
+@https_fn.on_call()
+def get_todos(req: https_fn.CallableRequest) -> Any:
+    todo_ref = db.collection("Todos")
+    docs = todo_ref.stream()
+
+    data = []
+
+    for doc in docs:
+        data.append({
+                    "id": doc.id,
+                    **doc.to_dict()
+                })
+
+    return {"success": True, "data": data}, 200
+
+
+@https_fn.on_call()
+def delete_todo(req: https_fn.CallableRequest) -> Any:
+    document_id = req.data["id"]
+
+    todo = db.collection("Todos").document(document_id)
+    todo.delete()
+
+    return {"success": True}, 200
+
+
+@https_fn.on_call()
+def upload_generic_note(req: https_fn.CallableRequest) -> Any:
+
+    # Extracting HTML String
+    html_content = req.data["note"]
+    file_name = req.data["fileName"]
+
+    # Saving HTML String as temp File
+    temp_file_path = os.path.join("/tmp", file_name)
+    with open(temp_file_path, "w", encoding="utf-8") as file:
+        file.write(html_content)
+
+    #stores temporary file in Notes folder in bucket (Firebase Storage)
+    blob = bucket.blob(f"Notes/{uuid.uuid4()}")
+    blob.upload_from_filename(temp_file_path, content_type="text/html")
+    blob.make_public()
+
+    public_url = blob.public_url
+
+    #removes temp file
+    os.remove(temp_file_path)
+
+    # Return success message
+    return {"message": "File uploaded successfully", "url": blob.public_url}, 200

@@ -26,8 +26,9 @@ import {getFunctions, httpsCallable} from "firebase/functions";
 import {getApp} from "firebase/app";
 
 interface task {
-  name: string,
+  title: string,
   description: string,
+  id: string,
 }
 
 export default function TodoScreen() {
@@ -36,8 +37,10 @@ export default function TodoScreen() {
   const [newTodoDesc, setNewTodoDesc] = useState("")
   const [modalVisible, setModalVisible] = useState(false)
 
+  const [changed, setChanged] = useState(false)
+
   const functions = getFunctions();
-  const getTodos = httpsCallable(functions, 'getTodos');
+  const getTodos = httpsCallable(functions, 'get_todos');
   const addTodoFunction = httpsCallable(functions, 'add_todo');
 
   const showModal = () => {
@@ -54,6 +57,8 @@ export default function TodoScreen() {
     addTodoFunction(newTodo)
       .then((result) => {
         console.log(result.data)
+
+        setChanged(true)
       })
 
     setNewTodoName("")
@@ -63,21 +68,16 @@ export default function TodoScreen() {
   }
 
   useEffect(() => {
-
-    // call the api to get the notes onto this screen
-    getTodos({})
+    getTodos()
       .then((result) => {
-        // Read result of the Cloud Function.
-        /** @type {any} */
         const data = result.data;
-        // const sanitizedMessage = data.text;
-
         // @ts-ignore
-        setTodos(data);
+        console.log(data[0].data);
+        // @ts-ignore
+        setTodos(data[0].data);
+        setChanged(false)
       });
-
-    setTodos([]);
-  }, [])
+  }, [changed])
 
   return (
     <SafeAreaView className={"flex h-screen-safe justify-center"}>
@@ -92,7 +92,7 @@ export default function TodoScreen() {
             value={newTodoName}
             placeholder={"New Todo Name"}
             placeholderTextColor={"#A9A9A9"}
-            className={"border-2 border-black p-8 m-2 rounded-md w-auto text-black"}
+            className={"border-2 border-black p-8 m-2 rounded-md w-auto text-black w-full"}
           >
 
           </TextInput>
@@ -102,7 +102,7 @@ export default function TodoScreen() {
             value={newTodoDesc}
             placeholder={"New Todo Description"}
             placeholderTextColor={"#A9A9A9"}
-            className={"border-2 border-black p-4 m-2 rounded-md text-black w-auto"}
+            className={"border-2 border-black p-4 m-2 rounded-md text-black w-auto w-full"}
           >
 
           </TextInput>
@@ -118,7 +118,7 @@ export default function TodoScreen() {
       <ScrollView>
         {todos.map(
           (item) => (
-            <Task name={item.name} description={item.description} key={item.name}/>
+            <Task name={item.title} description={item.description} key={item.id} id={item.id} setChanged={setChanged}/>
           )
         )}
       </ScrollView>

@@ -1,20 +1,48 @@
-import { useState } from 'react';
-import {View, StyleSheet, TouchableOpacity, SafeAreaView, Image} from 'react-native';
+import {Dispatch, SetStateAction, useState} from 'react';
+import {View, StyleSheet, TouchableOpacity, SafeAreaView, Image, TextInput, Text} from 'react-native';
 import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
 import * as FileSystem from 'expo-file-system';
+import Modal from "react-native-modal";
+import {router, useLocalSearchParams} from "expo-router";
 
-export default function App() {
+
+export default function RecordingScreen() {
+
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isRecording, setIsRecording] = useState(false)
   const [name, setName] = useState("default recording name")
+  const [modalVisible, setModalVisible] = useState(false)
+  const [base64Data, setBase64Data] = useState("")
 
   const app = getApp();
   const functions = getFunctions(app);
   const addRecording = httpsCallable(functions, 'store_audio_metadata');
+
+  const showModal = () => {
+    setModalVisible(true)
+  }
+
+  const hideModal = () => {
+    setModalVisible(false)
+  }
+
+  const saveRecording = () => {
+    addRecording({
+      fileName: `${name || Date.now()}.m4a`,
+      audioData: base64Data
+    })
+      .then((result) => {
+        console.log(result.data);
+      });
+
+    hideModal();
+
+    router.push("/(tabs)/recordings")
+  }
 
   async function startRecording() {
     try {
@@ -56,25 +84,42 @@ export default function App() {
       encoding: FileSystem.EncodingType.Base64
     });
 
-    // Get file extension from URI
-    const fileExtension = uri.split('.').pop();
+    setBase64Data(base64Data)
 
-    addRecording({
-      fileName: `${name || Date.now()}.${fileExtension}`,
-      audioData: base64Data
-    })
-      .then((result) => {
-        console.log(result.data);
-      });
-
-    setIsRecording(false);
+    setIsRecording(false)
 
     console.log('Recording stopped and stored at', uri);
+
+    showModal()
   }
 
 
   return(
     <SafeAreaView className={"flex justify-center items-center bg-[#ecf0f1] p-10 h-screen-safe"}>
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={hideModal}
+        className={"flex justify-center items-center "}
+      >
+        <View className={"flex justify-center items-center bg-white h-1/3 w-3/4 rounded-lg p-10"}>
+          <TextInput
+            onChangeText={setName}
+            value={name}
+            placeholder={"New Recording Name"}
+            placeholderTextColor={"#A9A9A9"}
+            className={"border-2 border-black p-8 m-2 rounded-md w-auto text-black"}
+          >
+
+          </TextInput>
+
+          <TouchableOpacity onPress={saveRecording} className={"flex justify-center items-center bg-green-700 h-12 w-full p-4 m-4 rounded-lg"}>
+            <Text className={"color-white"}>
+              Stop Recording
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
         <TouchableOpacity
           onPress={isRecording ? stopRecording : startRecording}
         >

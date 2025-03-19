@@ -26,6 +26,14 @@ bucket = storage.bucket("studybuddy-d4472.firebasestorage.app")
 @https_fn.on_call()
 def upload_note(req: https_fn.CallableRequest) -> Any:
 
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+    uid = req.auth.uid
+
     # Extracting HTML String
     html_content = req.data["note"]
     file_name = req.data["fileName"]
@@ -36,7 +44,7 @@ def upload_note(req: https_fn.CallableRequest) -> Any:
         file.write(html_content)
 
     #stores temporary file in Notes folder in bucket (Firebase Storage)
-    blob = bucket.blob(f"Notes/{uuid.uuid4()}")
+    blob = bucket.blob(f"{uid}/notes/{uuid.uuid4()}")
     blob.upload_from_filename(temp_file_path, content_type="text/html")
     blob.make_public()
 
@@ -46,7 +54,7 @@ def upload_note(req: https_fn.CallableRequest) -> Any:
     os.remove(temp_file_path)
 
     # Uploading MetaData to FireStore
-    doc_ref = db.collection("notes").add({
+    doc_ref = db.collection(f"{uid}/notes").add({
             "name": file_name,
             "fileUrl": public_url,
             "summary": "",
@@ -58,24 +66,39 @@ def upload_note(req: https_fn.CallableRequest) -> Any:
 
 @https_fn.on_call()
 def get_notes(req: https_fn.CallableRequest) -> Any:
-    todo_ref = db.collection("notes")
-    docs = todo_ref.stream()
+   # Checking that the user is authenticated.
+   if req.auth is None:
+       # Throwing an HttpsError so that the client gets the error details.
+       raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                 message="The function must be called while authenticated.")
 
-    data = []
+   uid = req.auth.uid
 
-    for doc in docs:
-        data.append({
+   todo_ref = db.collection(f"{uid}/notes")
+   docs = todo_ref.stream()
+
+   data = []
+
+   for doc in docs:
+       data.append({
                         "id": doc.id,
                         **doc.to_dict()
-                    })
+                   })
 
-    return {"success": True, "data": data}, 200
+   return {"success": True, "data": data}, 200
 
 @https_fn.on_call()
 def delete_note(req: https_fn.CallableRequest) -> Any:
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+
     document_id = req.data["id"]
 
-    todo = db.collection("notes").document(document_id)
+    todo = db.collection(f"{uid}/notes").document(document_id)
     todo.delete()
 
     return {"success": True}, 200
@@ -83,33 +106,49 @@ def delete_note(req: https_fn.CallableRequest) -> Any:
 # Cloud Function to Handle Audio Metadata (Firestore) and Cloud Storage (Firebase)
 @https_fn.on_call()
 def store_audio_metadata(req: https_fn.CallableRequest) -> Any:
-        fileName = req.data['fileName']
-        audio_bytes = base64.b64decode(req.data['audioData'])
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
 
-        if fileName == '':
-            return {"error": "No selected file"}, 400
+    uid = req.auth.uid
 
-        # Upload to Firebase Storage Recordings Folder
-        blob = bucket.blob(f"Recordings/{uuid.uuid4()}")
-        blob.upload_from_string(audio_bytes, content_type='audio/mp4')
-        blob.make_public()
+    fileName = req.data['fileName']
+    audio_bytes = base64.b64decode(req.data['audioData'])
 
-        public_url = blob.public_url
+    if fileName == '':
+        return {"error": "No selected file"}, 400
 
-        # Store Metadata in Firestore
-        doc_ref = db.collection("audioRecordings").add({
-            "name": fileName,
-            "fileUrl": public_url,
-            "transcription": "",
-            "createdAt": firestore.SERVER_TIMESTAMP,
-        })
+    # Upload to Firebase Storage Recordings Folder
+    blob = bucket.blob(f"{uid}/recordings/{uuid.uuid4()}")
+    blob.upload_from_string(audio_bytes, content_type='audio/mp4')
+    blob.make_public()
 
-        #Success Message
-        return {"message": "Audio uploaded successfully", "url": public_url, "id": doc_ref[1].id}, 200
+    public_url = blob.public_url
+
+    # Store Metadata in Firestore
+    doc_ref = db.collection(f"{uid}/recordings").add({
+        "name": fileName,
+        "fileUrl": public_url,
+        "transcription": "",
+        "createdAt": firestore.SERVER_TIMESTAMP,
+    })
+
+    #Success Message
+    return {"message": "Audio uploaded successfully", "url": public_url, "id": doc_ref[1].id}, 200
 
 @https_fn.on_call()
 def get_audios(req: https_fn.CallableRequest) -> Any:
-    todo_ref = db.collection("audioRecordings")
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+    uid = req.auth.uid
+
+    todo_ref = db.collection(f"{uid}/recordings")
     docs = todo_ref.stream()
 
     data = []
@@ -125,9 +164,17 @@ def get_audios(req: https_fn.CallableRequest) -> Any:
 
 @https_fn.on_call()
 def delete_recording(req: https_fn.CallableRequest) -> Any:
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+    uid = req.auth.uid
+
     document_id = req.data["id"]
 
-    todo = db.collection("audioRecordings").document(document_id)
+    todo = db.collection(f"{uid}/recordings").document(document_id)
     todo.delete()
 
     return {"success": True}, 200
@@ -135,6 +182,12 @@ def delete_recording(req: https_fn.CallableRequest) -> Any:
 # Cloud Function to Store To-Do List Items in Firestore (NO Firebase Storage)
 @https_fn.on_call()
 def add_todo(req: https_fn.CallableRequest) -> Any:
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+    uid = req.auth.uid
     
     # JSON File Check
     title = req.data["name"]
@@ -144,7 +197,7 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
         return jsonify({"error": "Missing title or description"}), 400
 
     # Save to Firestore
-    doc_ref = db.collection("Todos").add({
+    doc_ref = db.collection(f"{uid}/todos").add({
         "title": title,
         "description": description,
         "createdAt": firestore.SERVER_TIMESTAMP,
@@ -155,7 +208,15 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
 
 @https_fn.on_call()
 def get_todos(req: https_fn.CallableRequest) -> Any:
-    todo_ref = db.collection("Todos")
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+    uid = req.auth.uid
+
+    todo_ref = db.collection(f"{uid}/todos")
     docs = todo_ref.stream()
 
     data = []
@@ -171,9 +232,17 @@ def get_todos(req: https_fn.CallableRequest) -> Any:
 
 @https_fn.on_call()
 def delete_todo(req: https_fn.CallableRequest) -> Any:
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+    uid = req.auth.uid
+
     document_id = req.data["id"]
 
-    todo = db.collection("Todos").document(document_id)
+    todo = db.collection(f"{uid}/todos").document(document_id)
     todo.delete()
 
     return {"success": True}, 200
@@ -181,6 +250,13 @@ def delete_todo(req: https_fn.CallableRequest) -> Any:
 
 @https_fn.on_call()
 def upload_generic_note(req: https_fn.CallableRequest) -> Any:
+    # Checking that the user is authenticated.
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                  message="The function must be called while authenticated.")
+
+    uid = req.auth.uid
 
     # Extracting HTML String
     html_content = req.data["note"]
@@ -192,7 +268,7 @@ def upload_generic_note(req: https_fn.CallableRequest) -> Any:
         file.write(html_content)
 
     #stores temporary file in Notes folder in bucket (Firebase Storage)
-    blob = bucket.blob(f"Notes/{uuid.uuid4()}")
+    blob = bucket.blob(f"{uid}/notes/{uuid.uuid4()}")
     blob.upload_from_filename(temp_file_path, content_type="text/html")
     blob.make_public()
 

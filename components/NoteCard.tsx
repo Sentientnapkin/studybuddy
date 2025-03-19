@@ -16,6 +16,7 @@ interface TodoFormProps {
   setModalVisible: Dispatch<SetStateAction<boolean>>,
   setSummaryText: Dispatch<SetStateAction<string>>,
   setNoteName: Dispatch<SetStateAction<string>>,
+  updateNotes: () => void;
 };
 
 export default function NoteCard(props: TodoFormProps) {
@@ -32,7 +33,7 @@ export default function NoteCard(props: TodoFormProps) {
     deleteNote({id: props.id}).then(
       (response) => {
         console.log(response.data)
-        // props.setChanged(true)
+        props.updateNotes()
       }
     )
   }
@@ -64,22 +65,25 @@ export default function NoteCard(props: TodoFormProps) {
   }
 
   return(
-    <View  className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-8 m-4 justify-between items-center"}>
-      <TouchableOpacity onPress={openNote} onLongPress={viewSummary}>
-        <Text>
-          {props.title}
-        </Text>
-        {props.editing &&
-            <TouchableOpacity onPress={deleteItem} className={"absolute right-0 p-4"}>
-                <IconSymbol name={"x.circle"} color={"red"}/>
-            </TouchableOpacity>
-        }
+    <View  className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-2 m-4 justify-between items-center"}>
+      <TouchableOpacity onPress={openNote} onLongPress={viewSummary} className={"p-6"}>
+        <View>
+          <Text>
+            {props.title}
+          </Text>
+        </View>
       </TouchableOpacity>
 
       {
         hasBeenSummarized &&
           <TouchableOpacity className={""} onPress={summarizeNote}>
               <IconSymbol size={28} name={"pencil"} color={"black"}/>
+          </TouchableOpacity>
+      }
+
+      {props.editing &&
+          <TouchableOpacity onPress={deleteItem} className={""}>
+              <IconSymbol name={"trash.fill"} color={"red"}/>
           </TouchableOpacity>
       }
     </View>

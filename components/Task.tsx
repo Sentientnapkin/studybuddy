@@ -2,14 +2,13 @@ import React, {View, Text, TouchableOpacity} from "react-native";
 import {getApp} from "firebase/app";
 import {getFunctions, httpsCallable} from "firebase/functions";
 import {IconSymbol} from "@/components/ui/IconSymbol";
-import {Dispatch, SetStateAction} from "react";
 
 interface TaskProps {
   name: string,
   description: string,
   key: string,
   id: string,
-  setChanged: Dispatch<SetStateAction<boolean>>,
+  updateTodos: () => void,
 }
 export default function Task(props : TaskProps) {
   const app = getApp();
@@ -21,12 +20,10 @@ export default function Task(props : TaskProps) {
     deleteTodo({id: props.id}).then(
       (response) => {
         console.log(response.data)
-        props.setChanged(true)
+        props.updateTodos()
       }
     )
-
   }
-
 
   return (
     <View className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-8 m-4"}>

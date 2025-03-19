@@ -3,6 +3,7 @@ import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import { Audio } from 'expo-av';
 import transcribeRecording from "@/scripts/transcribeRecording";
 import {IconSymbol} from "@/components/ui/IconSymbol";
+import {getFunctions, httpsCallable} from "firebase/functions";
 
 
 interface RecordingProps {
@@ -10,14 +11,18 @@ interface RecordingProps {
   fileUrl: string,
   key: string,
   transcription: string,
+  editing: boolean,
   id: string,
   setModalVisible: Dispatch<SetStateAction<boolean>>,
   setTranscriptionText: Dispatch<SetStateAction<string>>,
   setRecordingName: Dispatch<SetStateAction<string>>,
+  updateRecordings: () => void,
 }
 export default function RecordingCard(props : RecordingProps) {
   const [sound, setSound] = useState();
   const hasBeenSummarized = props.transcription == "";
+  const functions = getFunctions();
+  const deleteRecording = httpsCallable(functions, 'delete_recording');
 
   async function playSound() {
     console.log('Loading Sound');
@@ -39,6 +44,15 @@ export default function RecordingCard(props : RecordingProps) {
     props.setTranscriptionText(props.transcription)
     props.setRecordingName(props.name)
     props.setModalVisible(true);
+  }
+
+  const deleteAudio = () => {
+    deleteRecording({id: props.id}).then(
+      (response) => {
+        console.log(response.data)
+        props.updateRecordings()
+      }
+    )
   }
 
   useEffect(() => {
@@ -65,6 +79,11 @@ export default function RecordingCard(props : RecordingProps) {
           <TouchableOpacity className={""} onPress={transcribe}>
             <IconSymbol size={28} name={"pencil"} color={"black"}/>
           </TouchableOpacity>
+      }
+      {props.editing &&
+        <TouchableOpacity onPress={deleteAudio}>
+          <IconSymbol size={28} name={"trash.fill"} color={"black"}/>
+        </TouchableOpacity>
       }
     </View>
   )

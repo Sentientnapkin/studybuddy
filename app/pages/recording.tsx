@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, SafeAreaView, Image, TextInput, Text} from 'react-native';
 import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
@@ -10,13 +10,14 @@ import {router, useLocalSearchParams} from "expo-router";
 
 
 export default function RecordingScreen() {
-
   const [recording, setRecording] = useState();
   const [permissionResponse, requestPermission] = Audio.usePermissions();
   const [isRecording, setIsRecording] = useState(false)
   const [name, setName] = useState("default recording name")
   const [modalVisible, setModalVisible] = useState(false)
   const [base64Data, setBase64Data] = useState("")
+
+  const [shouldUpdate, setShouldUpdate] = useState("")
 
   const app = getApp();
   const functions = getFunctions(app);
@@ -41,7 +42,9 @@ export default function RecordingScreen() {
 
     hideModal();
 
-    router.push("/(tabs)/recordings")
+    setShouldUpdate("yes")
+
+    router.push({pathname: "/(tabs)/recordings", params: {readyToUpdate: shouldUpdate}})
   }
 
   async function startRecording() {
@@ -92,6 +95,10 @@ export default function RecordingScreen() {
 
     showModal()
   }
+
+  useEffect(() => {
+    setShouldUpdate("no")
+  }, [])
 
 
   return(

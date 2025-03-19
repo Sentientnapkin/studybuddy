@@ -14,7 +14,6 @@ export default async function summarizeText(noteToSummarize : string, id : strin
     xhr.onerror = () => reject(new Error('Failed to fetch HTML file'));
     xhr.open('GET', noteToSummarize);
     xhr.send();
-
   });
 
   const textPart = "Can you summarize the text from this document that is formatted in html (only focus on the actual text information not the divs and other html attributes): "

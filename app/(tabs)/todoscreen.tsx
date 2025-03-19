@@ -20,10 +20,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import {useEffect, useState} from "react";
 import Task from "@/components/Task";
 import Modal from "react-native-modal";
-import {set} from "@firebase/database";
-import {Link} from "expo-router";
 import {getFunctions, httpsCallable} from "firebase/functions";
-import {getApp} from "firebase/app";
 
 interface task {
   title: string,
@@ -67,7 +64,7 @@ export default function TodoScreen() {
     hideModal();
   }
 
-  useEffect(() => {
+  const updateTodos = () => {
     getTodos()
       .then((result) => {
         const data = result.data;
@@ -77,6 +74,10 @@ export default function TodoScreen() {
         setTodos(data[0].data);
         setChanged(false)
       });
+  }
+
+  useEffect(() => {
+    updateTodos()
   }, [changed])
 
   return (
@@ -118,7 +119,11 @@ export default function TodoScreen() {
       <ScrollView>
         {todos.map(
           (item) => (
-            <Task name={item.title} description={item.description} key={item.id} id={item.id} setChanged={setChanged}/>
+            <Task
+              name={item.title}
+              description={item.description}
+              key={item.id} id={item.id}
+              updateTodos={updateTodos}/>
           )
         )}
       </ScrollView>

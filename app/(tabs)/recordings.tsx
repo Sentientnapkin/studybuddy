@@ -9,7 +9,7 @@ import {
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import {useEffect, useState} from "react";
 import RecordingCard from "@/components/RecordingCard";
-import {Link, router} from "expo-router";
+import {Link, router, useLocalSearchParams} from "expo-router";
 import {getFunctions, httpsCallable} from "firebase/functions";
 import {getApp} from "firebase/app";
 import Modal from "react-native-modal";
@@ -22,10 +22,12 @@ interface recording {
 }
 
 export default function RecordingsScreen() {
+  const {readyToUpdate} = useLocalSearchParams();
   const [recordings, setRecordings] = useState<recording[]>([])
   const [modalVisible, setModalVisible] = useState(false);
   const [transcriptionText, setTranscriptionText] = useState("");
   const [recordingName, setRecordingName] = useState("");
+  const [editing, setEditing] = useState(false);
 
   const app = getApp();
   const functions = getFunctions(app);
@@ -37,8 +39,11 @@ export default function RecordingsScreen() {
     setRecordingName("")
   }
 
-  // calling cloud functions from backend
-  useEffect(() => {
+  const switchEditing =() => {
+    setEditing(!editing);
+  }
+
+  const updateRecordings = () => {
     getRecordings()
       .then((result) => {
         // Read result of the Cloud Function.
@@ -51,7 +56,11 @@ export default function RecordingsScreen() {
         // @ts-ignore
         setRecordings(data[0].data);
       });
-  }, [router])
+  }
+
+  useEffect(() => {
+    updateRecordings();
+  }, [readyToUpdate])
 
   return (
     <SafeAreaView className={"flex h-screen-safe justify-center"}>
@@ -70,10 +79,28 @@ export default function RecordingsScreen() {
         </View>
       </Modal>
 
+      <View className={"flex flex-row justify-end items-center p-4 m-2"}>
+        <TouchableOpacity onPress={switchEditing}>
+          <Text className={"text-xl text-white"}>
+            Edit
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView>
         {recordings.map(
           (item) => (
-            <RecordingCard name={item.name} fileUrl={item.fileUrl} key={item.id} transcription={item.transcription} id={item.id} setModalVisible={setModalVisible} setTranscriptionText={setTranscriptionText} setRecordingName={setRecordingName}/>
+            <RecordingCard
+              name={item.name}
+              fileUrl={item.fileUrl}
+              key={item.id}
+              transcription={item.transcription}
+              id={item.id}
+              editing={editing}
+              setModalVisible={setModalVisible}
+              setTranscriptionText={setTranscriptionText}
+              setRecordingName={setRecordingName}
+              updateRecordings={updateRecordings}/>
           )
         )}
       </ScrollView>

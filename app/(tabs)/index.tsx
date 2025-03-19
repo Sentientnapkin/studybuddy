@@ -17,6 +17,8 @@ import { getApp, initializeApp, getApps } from 'firebase/app';
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { firebaseConfig } from "@/services/firebaseConfig";
 import Modal from "react-native-modal";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useRouter } from "expo-router";
 
 type Note = {
   name: string,
@@ -32,9 +34,12 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [summaryText, setSummaryText] = useState("");
   const [noteName, setNoteName] = useState("");
+  const router = useRouter(); // Expo Router navigation
+
 
   const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   const functions = getFunctions(app);
+  const auth = getAuth();
   const getNotes = httpsCallable(functions, 'get_notes');
 
   const closeModal = () => {
@@ -44,6 +49,23 @@ export default function HomeScreen() {
   }
 
   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+  
+        console.log(user.uid)
+  
+        const uid = user.uid;
+        // ...
+      } else {
+        // User is signed out
+        // ...
+  
+        router.push("/login")
+      }
+    });
+
     getNotes()
       .then((result) => {
         const data = result.data;

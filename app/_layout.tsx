@@ -30,7 +30,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{animation: 'slide_from_bottom'}}>
+      <Stack screenOptions={{animation: 'slide_from_bottom'}} initialRouteName="login">
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="pages/notetaking" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />

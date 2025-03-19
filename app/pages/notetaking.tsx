@@ -11,7 +11,8 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput, TouchableOpacity,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {actions, FONT_SIZE, getContentCSS, RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
@@ -22,11 +23,7 @@ import {Link, router, useLocalSearchParams} from "expo-router";
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
-import {saveSnapshot} from "react-native-reanimated/lib/typescript/layoutReanimation/web";
 import {doc, getFirestore, updateDoc} from "firebase/firestore";
-import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
-import { v4 as uuidv4 } from 'uuid';
-import * as url from "node:url";
 
 type IconRecord = {
   selected: boolean;
@@ -89,7 +86,10 @@ export default function NoteTakingScreen(props: IProps) {
   const linkModal = useRef<RefLinkModal>();
   const scrollRef = useRef<ScrollView>(null);
   // save on html
-  const [name, setName] = useState("");
+  const [name, setName] = useState(previousName);
+
+  const [shouldUpdate, setShouldUpdate] = useState("")
+
 
   const [theme, setTheme] = useState("light");
   const [emojiVisible, setEmojiVisible] = useState(false);
@@ -103,19 +103,22 @@ export default function NoteTakingScreen(props: IProps) {
   const db = getFirestore(app)
 
   // on save to preview
-  const handleSave = useCallback(async () => {
+  const handleSave = async () => {
+    setShouldUpdate("yes")
+    console.log("name | " + name)
+
     if (id == undefined) {
       addNote({ fileName: `${name}.html`, note: contentRef.current })
         .then((result) => {
           // Read result of the Cloud Function.
           /** @type {any} */
           console.log(result.data);
-          router.push("/(tabs)")
+          router.push({pathname: "/(tabs)", params: {readyToUpdate: shouldUpdate}})
         });
     } else {
       const noteRef = doc(db, "notes", id);
 
-      addBlob({ fileName: `${previousName}.html`, note: contentRef.current })
+      addBlob({ fileName: `${name}.html`, note: contentRef.current })
         .then(async (result) => {
           // Read result of the Cloud Function.
           /** @type {any} */
@@ -126,10 +129,10 @@ export default function NoteTakingScreen(props: IProps) {
             fileUrl: result.data[0].url,
           })
 
-          router.push("/(tabs)")
+          router.push({pathname: "/(tabs)", params: {readyToUpdate: shouldUpdate}})
         });
     }
-  }, [navigation]);
+  };
 
   const handleHome = useCallback(() => {
     navigation.push('index');
@@ -280,6 +283,7 @@ export default function NoteTakingScreen(props: IProps) {
   }, []);
 
   useEffect(() => {
+    setShouldUpdate("no")
     setTheme('light')
     let listener = [
       Keyboard.addListener('keyboardDidShow', onKeyShow),
@@ -319,11 +323,9 @@ export default function NoteTakingScreen(props: IProps) {
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder={"Set Name Here"}
+            placeholder={(previousName == undefined || previousName == "") ? "Set Name Here" : previousName}
             placeholderTextColor={"black"}
-          >
-
-          </TextInput>
+          />
 
           <TouchableOpacity onPress={handleSave} className={"flex-row justify-items-center"}>
             <Text className={"text-xl"}>

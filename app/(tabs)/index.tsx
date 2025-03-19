@@ -10,7 +10,7 @@ import {
   Text
 } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import {Link} from "expo-router";
+import {Link, useLocalSearchParams} from "expo-router";
 import {useEffect, useState} from "react";
 import NoteCard from "@/components/NoteCard";
 import { getApp, initializeApp, getApps } from 'firebase/app';
@@ -26,6 +26,7 @@ type Note = {
 }
 
 export default function HomeScreen() {
+  const {readyToUpdate} = useLocalSearchParams();
   const [notes, setNotes] = useState<Note[]>([])
   const [editing, setEditing] = useState(false)
 
@@ -34,7 +35,7 @@ export default function HomeScreen() {
   const [noteName, setNoteName] = useState("");
 
   const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-  const functions = getFunctions(app);
+  const functions = getFunctions();
   const getNotes = httpsCallable(functions, 'get_notes');
 
   const closeModal = () => {
@@ -43,7 +44,11 @@ export default function HomeScreen() {
     setNoteName("")
   }
 
-  useEffect(() => {
+  const switchEditing =() => {
+    setEditing(!editing);
+  }
+
+  const updateNotes = () => {
     getNotes()
       .then((result) => {
         const data = result.data;
@@ -52,7 +57,11 @@ export default function HomeScreen() {
         // @ts-ignore
         setNotes(data[0].data);
       });
-  }, [])
+  }
+
+  useEffect(() => {
+    updateNotes()
+  }, [readyToUpdate])
 
   return (
     <SafeAreaView className={"flex h-screen-safe justify-center"}>
@@ -60,8 +69,7 @@ export default function HomeScreen() {
         isVisible={modalVisible}
         onBackdropPress={closeModal}
         style={{margin: 0}}
-        className={"flex  "}
-
+        className={"flex"}
       >
         <View className={"flex justify-start bg-white h-4/6 w-full rounded-lg p-10"}>
           <View >
@@ -71,10 +79,29 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
+      <View className={"flex flex-row justify-end items-center p-2 m-2"}>
+        <TouchableOpacity onPress={switchEditing}>
+          <Text className={"text-xl text-white"}>
+            Edit
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView className={""}>
         {notes.map(
           note => (
-            <NoteCard title={note.name} editing={editing} data={note.fileUrl} key={note.id} id={note.id} summary={note.summary} setNoteName={setNoteName} setSummaryText={setSummaryText} setModalVisible={setModalVisible}/>
+            <NoteCard
+              title={note.name}
+              editing={editing}
+              data={note.fileUrl}
+              key={note.id}
+              id={note.id}
+              summary={note.summary}
+              setNoteName={setNoteName}
+              setSummaryText={setSummaryText}
+              setModalVisible={setModalVisible}
+              updateNotes={updateNotes}
+            />
           )
         )}
       </ScrollView>

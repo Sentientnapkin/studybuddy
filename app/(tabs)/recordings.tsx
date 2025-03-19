@@ -37,6 +37,7 @@ export default function RecordingsScreen() {
     setRecordingName("")
   }
 
+  // calling cloud functions from backend
   useEffect(() => {
     getRecordings()
       .then((result) => {

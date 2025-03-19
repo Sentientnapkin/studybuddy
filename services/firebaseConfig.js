@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 import { getFunctions } from 'firebase/functions';
+import { getAuth } from "firebase/auth"
 
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 const firebaseConfig = {
@@ -16,11 +17,14 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
+// Initialize Firebase Authentication and get a reference to the service
+const auth = getAuth(app);
+
 // Initialize Cloud Storage and get a reference to the service
 const db = getFirestore(app);
 const storage = getStorage(app);
 const functions = getFunctions(app);
 
-export {firebaseConfig, app, db, storage, functions};
+export {firebaseConfig, app, db, storage, functions, auth};
 
  

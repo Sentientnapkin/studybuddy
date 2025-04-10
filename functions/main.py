@@ -54,7 +54,7 @@ def upload_note(req: https_fn.CallableRequest) -> Any:
     os.remove(temp_file_path)
 
     # Uploading MetaData to FireStore
-    doc_ref = db.collection(f"{uid}/notes").add({
+    doc_ref = db.collection("users").document(uid).collection("notes").add({
             "name": file_name,
             "fileUrl": public_url,
             "summary": "",
@@ -74,7 +74,7 @@ def get_notes(req: https_fn.CallableRequest) -> Any:
 
    uid = req.auth.uid
 
-   todo_ref = db.collection(f"{uid}/notes")
+   todo_ref = db.collection("users").document(uid).collection("notes")
    docs = todo_ref.stream()
 
    data = []
@@ -98,7 +98,7 @@ def delete_note(req: https_fn.CallableRequest) -> Any:
 
     document_id = req.data["id"]
 
-    todo = db.collection(f"{uid}/notes").document(document_id)
+    todo = db.collection("users").document(uid).collection("notes").document(document_id)
     todo.delete()
 
     return {"success": True}, 200
@@ -128,7 +128,7 @@ def store_audio_metadata(req: https_fn.CallableRequest) -> Any:
     public_url = blob.public_url
 
     # Store Metadata in Firestore
-    doc_ref = db.collection(f"{uid}/recordings").add({
+    doc_ref = db.collection("users").document(uid).collection("recordings").add({
         "name": fileName,
         "fileUrl": public_url,
         "transcription": "",
@@ -148,7 +148,7 @@ def get_audios(req: https_fn.CallableRequest) -> Any:
 
     uid = req.auth.uid
 
-    todo_ref = db.collection(f"{uid}/recordings")
+    todo_ref = db.collection("users").document(uid).collection("recordings")
     docs = todo_ref.stream()
 
     data = []
@@ -174,7 +174,7 @@ def delete_recording(req: https_fn.CallableRequest) -> Any:
 
     document_id = req.data["id"]
 
-    todo = db.collection(f"{uid}/recordings").document(document_id)
+    todo = db.collection("users").document(uid).collection("recordings").document(document_id)
     todo.delete()
 
     return {"success": True}, 200
@@ -197,7 +197,7 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
         return jsonify({"error": "Missing title or description"}), 400
 
     # Save to Firestore
-    doc_ref = db.collection(f"{uid}/todos").add({
+    doc_ref = db.collection("users").document(uid).collection("todos").add({
         "title": title,
         "description": description,
         "createdAt": firestore.SERVER_TIMESTAMP,
@@ -216,7 +216,7 @@ def get_todos(req: https_fn.CallableRequest) -> Any:
 
     uid = req.auth.uid
 
-    todo_ref = db.collection(f"{uid}/todos")
+    todo_ref = db.collection("users").document(uid).collection("todos")
     docs = todo_ref.stream()
 
     data = []
@@ -242,7 +242,7 @@ def delete_todo(req: https_fn.CallableRequest) -> Any:
 
     document_id = req.data["id"]
 
-    todo = db.collection(f"{uid}/todos").document(document_id)
+    todo = db.collection("users").document(uid).collection("todos").document(document_id)
     todo.delete()
 
     return {"success": True}, 200

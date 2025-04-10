@@ -39,12 +39,8 @@ export default function HomeScreen() {
 
 
   const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-<<<<<<< HEAD
-  const functions = getFunctions(app);
   const auth = getAuth();
-=======
   const functions = getFunctions();
->>>>>>> 632d5aa20cb76e051475b73f231786a589c135c6
   const getNotes = httpsCallable(functions, 'get_notes');
 
   const closeModal = () => {
@@ -53,37 +49,35 @@ export default function HomeScreen() {
     setNoteName("")
   }
 
-<<<<<<< HEAD
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
-  
-        console.log(user.uid)
-  
+
+        // console.log(user.uid)
+
         const uid = user.uid;
         // ...
       } else {
         // User is signed out
         // ...
-  
+
         router.push("/login")
       }
-    });
+    })
+  });
 
-=======
   const switchEditing =() => {
     setEditing(!editing);
   }
 
   const updateNotes = () => {
->>>>>>> 632d5aa20cb76e051475b73f231786a589c135c6
     getNotes()
       .then((result) => {
         const data = result.data;
         // @ts-ignore
-        console.log(data[0].data)
+        // console.log(data[0].data)
         // @ts-ignore
         setNotes(data[0].data);
       });

@@ -50,7 +50,7 @@ export default function RecordingsScreen() {
         /** @type {any} */
         const data = result.data;
         // @ts-ignore
-        console.log(data[0].data)
+        // console.log(data[0].data)
         // const sanitizedMessage = data.text;
 
         // @ts-ignore

@@ -31,18 +31,18 @@ export default function RecordingScreen() {
     setModalVisible(false)
   }
 
-  const saveRecording = () => {
+  const saveRecording = async () => {
+    setShouldUpdate("yes")
+
     addRecording({
       fileName: `${name || Date.now()}.m4a`,
       audioData: base64Data
     })
       .then((result) => {
-        console.log(result.data);
+        // console.log(result.data);
       });
 
     hideModal();
-
-    setShouldUpdate("yes")
 
     router.push({pathname: "/(tabs)/recordings", params: {readyToUpdate: shouldUpdate}})
   }
@@ -98,17 +98,16 @@ export default function RecordingScreen() {
 
   useEffect(() => {
     setShouldUpdate("no")
-  }, [])
-
+  }, [isRecording])
 
   return(
     <SafeAreaView className={"flex justify-center items-center bg-[#ecf0f1] p-10 h-screen-safe"}>
       <Modal
         isVisible={modalVisible}
         onBackdropPress={hideModal}
-        className={"flex justify-center items-center "}
+        className={"flex justify-center items-center"}
       >
-        <View className={"flex justify-center items-center bg-white h-1/3 w-3/4 rounded-lg p-10"}>
+        <View className={"flex justify-center items-center bg-white h-1/3 w-11/12 rounded-lg p-10"}>
           <TextInput
             onChangeText={setName}
             value={name}

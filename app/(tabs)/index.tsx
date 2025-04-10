@@ -75,7 +75,7 @@ export default function HomeScreen() {
         // @ts-ignore
         setNotes(data[0].data);
       });
-  }
+  })
 
   useEffect(() => {
     updateNotes()

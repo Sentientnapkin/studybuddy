@@ -39,8 +39,8 @@ export default function HomeScreen() {
 
 
   const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-  const functions = getFunctions(app);
   const auth = getAuth();
+  const functions = getFunctions();
   const getNotes = httpsCallable(functions, 'get_notes');
 
   const closeModal = () => {
@@ -54,24 +54,30 @@ export default function HomeScreen() {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
-  
-        console.log(user.uid)
-  
+
+        // console.log(user.uid)
+
         const uid = user.uid;
         // ...
       } else {
         // User is signed out
         // ...
-  
+
         router.push("/login")
       }
-    });
+    })
+  });
 
+  const switchEditing =() => {
+    setEditing(!editing);
+  }
+
+  const updateNotes = () => {
     getNotes()
       .then((result) => {
         const data = result.data;
         // @ts-ignore
-        console.log(data[0].data)
+        // console.log(data[0].data)
         // @ts-ignore
         setNotes(data[0].data);
       });

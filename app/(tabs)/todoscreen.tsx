@@ -53,7 +53,7 @@ export default function TodoScreen() {
 
     addTodoFunction(newTodo)
       .then((result) => {
-        console.log(result.data)
+        // console.log(result.data)
 
         setChanged(true)
       })
@@ -69,7 +69,7 @@ export default function TodoScreen() {
       .then((result) => {
         const data = result.data;
         // @ts-ignore
-        console.log(data[0].data);
+        // console.log(data[0].data);
         // @ts-ignore
         setTodos(data[0].data);
         setChanged(false)

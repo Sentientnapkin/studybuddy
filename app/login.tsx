@@ -41,6 +41,7 @@ const LoginScreen = () => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        className={"text-white"}
       />
       <TextInput
         style={styles.input}
@@ -48,6 +49,7 @@ const LoginScreen = () => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        className={"text-white"}
       />
       {error && <Text style={styles.error}>{error}</Text>}
       <Button title="Login" onPress={handleLogin} />

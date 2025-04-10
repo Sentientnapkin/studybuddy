@@ -105,14 +105,13 @@ export default function NoteTakingScreen(props: IProps) {
   // on save to preview
   const handleSave = async () => {
     setShouldUpdate("yes")
-    console.log("name | " + name)
 
     if (id == undefined) {
       addNote({ fileName: `${name}.html`, note: contentRef.current })
         .then((result) => {
           // Read result of the Cloud Function.
           /** @type {any} */
-          console.log(result.data);
+          // console.log(result.data);
           router.push({pathname: "/(tabs)", params: {readyToUpdate: shouldUpdate}})
         });
     } else {
@@ -122,7 +121,7 @@ export default function NoteTakingScreen(props: IProps) {
         .then(async (result) => {
           // Read result of the Cloud Function.
           /** @type {any} */
-          console.log(result.data);
+          // console.log(result.data);
 
           await updateDoc(noteRef, {
             name: name,

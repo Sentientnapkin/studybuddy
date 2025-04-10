@@ -39,12 +39,8 @@ export default function HomeScreen() {
 
 
   const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-<<<<<<< HEAD
   const functions = getFunctions(app);
   const auth = getAuth();
-=======
-  const functions = getFunctions();
->>>>>>> 632d5aa20cb76e051475b73f231786a589c135c6
   const getNotes = httpsCallable(functions, 'get_notes');
 
   const closeModal = () => {
@@ -53,7 +49,6 @@ export default function HomeScreen() {
     setNoteName("")
   }
 
-<<<<<<< HEAD
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -72,13 +67,6 @@ export default function HomeScreen() {
       }
     });
 
-=======
-  const switchEditing =() => {
-    setEditing(!editing);
-  }
-
-  const updateNotes = () => {
->>>>>>> 632d5aa20cb76e051475b73f231786a589c135c6
     getNotes()
       .then((result) => {
         const data = result.data;

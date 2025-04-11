@@ -26,7 +26,7 @@ export default function Task(props : TaskProps) {
   }
 
   return (
-    <View className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-8 m-4"}>
+    <View className={"relative flex flex-row justify-between bg-gradient-to-r bg-white drop-shadow-md rounded-md text-center p-8 m-4"}>
       <Text>
         {props.name}
       </Text>

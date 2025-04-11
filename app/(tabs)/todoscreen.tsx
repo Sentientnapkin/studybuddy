@@ -8,7 +8,7 @@ import {
   Button,
   TouchableOpacity,
   TextInput,
-  Text
+  Text, StatusBar
 } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
@@ -32,21 +32,12 @@ export default function TodoScreen() {
   const [todos, setTodos] = useState<task[]>([])
   const [newTodoName, setNewTodoName] = useState("")
   const [newTodoDesc, setNewTodoDesc] = useState("")
-  const [modalVisible, setModalVisible] = useState(false)
 
   const [changed, setChanged] = useState(false)
 
   const functions = getFunctions();
   const getTodos = httpsCallable(functions, 'get_todos');
   const addTodoFunction = httpsCallable(functions, 'add_todo');
-
-  const showModal = () => {
-    setModalVisible(true)
-  }
-
-  const hideModal = () => {
-    setModalVisible(false)
-  }
 
   const addTodo = () => {
     const newTodo = {name: newTodoName, description: newTodoDesc}
@@ -60,8 +51,6 @@ export default function TodoScreen() {
 
     setNewTodoName("")
     setNewTodoDesc("")
-
-    hideModal();
   }
 
   const updateTodos = () => {
@@ -81,40 +70,28 @@ export default function TodoScreen() {
   }, [changed])
 
   return (
-    <SafeAreaView className={"flex h-screen-safe justify-center"}>
-      <Modal
-        isVisible={modalVisible}
-        onBackdropPress={hideModal}
-        className={"flex justify-center items-center "}
-      >
-        <View className={"flex justify-center items-center bg-white h-1/3 w-3/4 rounded-lg p-10"}>
-          <TextInput
-            onChangeText={setNewTodoName}
-            value={newTodoName}
-            placeholder={"New Todo Name"}
-            placeholderTextColor={"#A9A9A9"}
-            className={"border-2 border-black p-8 m-2 rounded-md w-auto text-black w-full"}
-          >
-
-          </TextInput>
-
-          <TextInput
-            onChangeText={setNewTodoDesc}
-            value={newTodoDesc}
-            placeholder={"New Todo Description"}
-            placeholderTextColor={"#A9A9A9"}
-            className={"border-2 border-black p-4 m-2 rounded-md text-black w-auto w-full"}
-          >
-
-          </TextInput>
-
-          <TouchableOpacity onPress={addTodo} className={"flex justify-center items-center bg-green-700 h-12 w-full p-4 m-4 rounded-lg"}>
-            <Text className={"color-white"}>
-              Add Todo
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+    <SafeAreaView className={"flex h-screen-safe justify-center text-center"}>
+      <StatusBar
+        animated={true}
+        backgroundColor="#61dafb"
+        barStyle={"default"}
+        hidden={false}
+      />
+      <View className="mt-8 flex flex-row mx-4 h-16">
+        <TextInput
+          onChangeText={setNewTodoName}
+          value={newTodoName}
+          placeholder={"Enter your task here"}
+          placeholderTextColor={"#A9A9A9"}
+          className="border-b-2 border-gray-500 text-black flex-grow text-xl"
+        />
+        <TouchableOpacity
+          onPress={addTodo}
+          className="ml-2 border-2 border-green-700 p-2  hover:text-white hover:bg-green-500 rounded-lg flex flex-row items-center justify-center w-20"
+        >
+          <Text className={"text-green-700"}>Add</Text>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView>
         {todos.map(
@@ -127,12 +104,6 @@ export default function TodoScreen() {
           )
         )}
       </ScrollView>
-
-      <View className={"absolute bottom-20 right-0 p-10"}>
-        <TouchableOpacity className={""} onPress={showModal}>
-          <IconSymbol size={52} name={"plus.circle.fill"} color={"green"}/>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }

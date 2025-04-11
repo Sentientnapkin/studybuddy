@@ -1,10 +1,9 @@
-import React, {View, Text, Button, TouchableOpacity} from "react-native";
+import React, {View, Text, Button, TouchableOpacity, Image} from "react-native";
 import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import { Audio } from 'expo-av';
 import transcribeRecording from "@/scripts/transcribeRecording";
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import {getFunctions, httpsCallable} from "firebase/functions";
-
 
 interface RecordingProps {
   name: string,
@@ -67,17 +66,17 @@ export default function RecordingCard(props : RecordingProps) {
   
   
   return (
-    <View  className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-8 m-4 items-center"}>
+    <View  className={"p-2 rounded-lg flex align-middle items-center flex-row justify-between bg-white drop-shadow-md m-2 h-20"}>
       <TouchableOpacity onPress={playSound} onLongPress={showTranscription}>
-        <Text>
-          {props.name}
+        <Text className={"p-2 text-xl font-bold text-black"}>
+          {props.name.substring(0, props.name.length - 4)}
         </Text>
       </TouchableOpacity>
 
       {
         hasBeenSummarized &&
           <TouchableOpacity className={""} onPress={transcribe}>
-            <IconSymbol size={28} name={"pencil"} color={"black"}/>
+              <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
           </TouchableOpacity>
       }
       {props.editing &&

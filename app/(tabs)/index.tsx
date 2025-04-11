@@ -7,7 +7,8 @@ import {
   Button,
   TouchableOpacity,
   SafeAreaView,
-  Text
+  Text,
+  ActivityIndicator
 } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import {Link, useLocalSearchParams} from "expo-router";

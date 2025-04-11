@@ -79,7 +79,7 @@ export default function NoteTakingScreen(props: IProps) {
   const {theme: initTheme = Appearance.getColorScheme(), navigation} = props;
   const {id, data, previousName} = useLocalSearchParams();
 
-  const initHTML = (data == undefined) ? `` : data;
+  const initHTML = data ? String(data) : "";
   const contentRef = useRef(initHTML);
 
   const richText = useRef<RichEditor>(null);
@@ -115,7 +115,7 @@ export default function NoteTakingScreen(props: IProps) {
           router.push({pathname: "/(tabs)", params: {readyToUpdate: shouldUpdate}})
         });
     } else {
-      const noteRef = doc(db, "notes", id);
+      const noteRef = doc(db, "notes", String(id));
 
       addBlob({ fileName: `${name}.html`, note: contentRef.current })
         .then(async (result) => {
@@ -125,7 +125,7 @@ export default function NoteTakingScreen(props: IProps) {
 
           await updateDoc(noteRef, {
             name: name,
-            fileUrl: result.data[0].url,
+            fileUrl: (result.data as any[])[0]?.url,
           })
 
           router.push({pathname: "/(tabs)", params: {readyToUpdate: shouldUpdate}})

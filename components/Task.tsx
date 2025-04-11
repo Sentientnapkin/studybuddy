@@ -2,6 +2,8 @@ import React, {View, Text, TouchableOpacity} from "react-native";
 import {getApp} from "firebase/app";
 import {getFunctions, httpsCallable} from "firebase/functions";
 import {IconSymbol} from "@/components/ui/IconSymbol";
+import BouncyCheckbox from "react-native-bouncy-checkbox/lib";
+import {useState} from "react";
 
 interface TaskProps {
   name: string,
@@ -14,6 +16,7 @@ export default function Task(props : TaskProps) {
   const app = getApp();
   const functions = getFunctions(app);
   const deleteTodo = httpsCallable(functions, 'delete_todo');
+  const [localChecked, setLocalChecked] = useState<boolean>(false);
 
 
   const finishTask = () => {
@@ -26,17 +29,26 @@ export default function Task(props : TaskProps) {
   }
 
   return (
-    <View className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-8 m-4"}>
-      <Text>
-        {props.name}
-      </Text>
+    <View className={"p-2 rounded-lg flex align-middle items-center flex-row justify-between bg-white drop-shadow-md m-2 h-20"}>
+      <View className="p-2 ml-1">
+        <BouncyCheckbox
+          size={32}
+          iconImageStyle={{
+            width: 16,
+            height: 16,
+          }}
+          fillColor={"green"}
+          onPress={(checked: boolean) => {
+          setLocalChecked(!localChecked);
+        }}/>
+      </View>
 
-      <Text>
-        {props.description}
-      </Text>
+      <View className="p-2">
+        <Text className={`text-lg text-black ${localChecked ? 'line-through' : ''}`}>{props.name}</Text>
+      </View>
 
-      <TouchableOpacity onPress={finishTask}>
-        <IconSymbol size={28} name={"trash.fill"} color={"black"}/>
+      <TouchableOpacity onPress={finishTask} className="flex text-red-500 border-2 border-red-500 p-2 rounded-lg mr-2">
+        <IconSymbol size={20} name={"xmark"} color={"red"}/>
       </TouchableOpacity>
     </View>
   )

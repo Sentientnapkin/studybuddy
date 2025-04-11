@@ -81,7 +81,7 @@ export default function RecordingsScreen() {
 
       <View className={"flex flex-row justify-end items-center p-4 m-2"}>
         <TouchableOpacity onPress={switchEditing}>
-          <Text className={"text-xl text-white"}>
+          <Text className={"text-xl text-black"}>
             Edit
           </Text>
         </TouchableOpacity>
@@ -104,7 +104,7 @@ export default function RecordingsScreen() {
           )
         )}
       </ScrollView>
-      <Link href={"/pages/recording"} className={"absolute bottom-20 right-0 p-10"}>
+      <Link href={"/pages/recording"} className={"absolute bottom-0 right-0 p-10"}>
         <TouchableOpacity className={""} onPress={() => {}}>
           <IconSymbol size={52} name={"record.circle"} color={"red"}/>
         </TouchableOpacity>

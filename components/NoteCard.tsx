@@ -65,25 +65,22 @@ export default function NoteCard(props: TodoFormProps) {
   }
 
   return(
-    <View  className={"relative flex flex-row justify-between bg-gradient-to-r bg-gray-500 rounded-md text-center p-2 m-4 justify-between items-center"}>
-      <TouchableOpacity onPress={openNote} onLongPress={viewSummary} className={"p-6"}>
-        <View>
-          <Text>
-            {props.title}
-          </Text>
-        </View>
+    <View  className={"p-2 rounded-lg flex align-middle items-center flex-row justify-between bg-white drop-shadow-md m-2 h-20"}>
+      <TouchableOpacity onPress={openNote} onLongPress={viewSummary}>
+        <Text className={"p-2 text-xl font-bold text-black"}>
+          {props.title.substring(0, props.title.length - 5)}
+        </Text>
       </TouchableOpacity>
 
       {
         hasBeenSummarized &&
           <TouchableOpacity className={""} onPress={summarizeNote}>
-              <IconSymbol size={28} name={"pencil"} color={"black"}/>
+              <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
           </TouchableOpacity>
       }
-
       {props.editing &&
-          <TouchableOpacity onPress={deleteItem} className={""}>
-              <IconSymbol name={"trash.fill"} color={"red"}/>
+          <TouchableOpacity onPress={deleteItem}>
+              <IconSymbol size={28} name={"trash.fill"} color={"red"}/>
           </TouchableOpacity>
       }
     </View>

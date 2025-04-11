@@ -15,7 +15,6 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Success", "Logged in successfully!");
       router.replace("/");
     } catch (err: any) {
       setError(getFirebaseErrorMessage(err.code));

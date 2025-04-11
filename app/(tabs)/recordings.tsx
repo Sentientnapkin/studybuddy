@@ -2,7 +2,7 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity, View,
-  Text,
+  Text, StatusBar,
 
 } from 'react-native';
 
@@ -64,6 +64,12 @@ export default function RecordingsScreen() {
 
   return (
     <SafeAreaView className={"flex h-screen-safe justify-center"}>
+      <StatusBar
+        animated={true}
+        backgroundColor="#61dafb"
+        barStyle={"default"}
+        hidden={false}
+      />
       <Modal
         isVisible={modalVisible}
         onBackdropPress={closeModal}
@@ -79,15 +85,14 @@ export default function RecordingsScreen() {
         </View>
       </Modal>
 
-      <View className={"flex flex-row justify-end items-center p-4 m-2"}>
+      <View className="flex-row justify-between items-center p-4">
+        <Text className="text-3xl font-bold text-gray-800">My Recordings</Text>
         <TouchableOpacity onPress={switchEditing}>
-          <Text className={"text-xl text-black"}>
-            Edit
-          </Text>
+          <Text className="text-xl text-blue-600">{editing ? "Done" : "Edit"}</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView className="px-1">
         {recordings.map(
           (item) => (
             <RecordingCard
@@ -104,9 +109,9 @@ export default function RecordingsScreen() {
           )
         )}
       </ScrollView>
-      <Link href={"/pages/recording"} className={"absolute bottom-0 right-0 p-10"}>
+      <Link href={"/pages/recording"} className={"absolute bottom-0 right-0 p-4"}>
         <TouchableOpacity className={""} onPress={() => {}}>
-          <IconSymbol size={52} name={"record.circle"} color={"red"}/>
+          <IconSymbol size={60} name={"record.circle"} color={"red"}/>
         </TouchableOpacity>
       </Link>
     </SafeAreaView>

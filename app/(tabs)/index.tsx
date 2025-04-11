@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Text,
-  ActivityIndicator
+  ActivityIndicator, StatusBar
 } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import {Link, useLocalSearchParams} from "expo-router";
@@ -95,7 +95,14 @@ export default function HomeScreen() {
   }, [readyToUpdate])
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaView className="flex bg-gray-100 flex h-screen-safe justify-center">
+      <StatusBar
+        animated={true}
+        backgroundColor="#61dafb"
+        barStyle={"default"}
+        hidden={false}
+      />
+
       {/* Modal for viewing note summaries */}
       <Modal
         isVisible={modalVisible}
@@ -114,7 +121,7 @@ export default function HomeScreen() {
       <View className="flex-row justify-between items-center p-4">
         <Text className="text-3xl font-bold text-gray-800">My Notes</Text>
         <TouchableOpacity onPress={switchEditing}>
-          <Text className="text-lg text-blue-600">{editing ? "Done" : "Edit"}</Text>
+          <Text className="text-xl text-blue-600">{editing ? "Done" : "Edit"}</Text>
         </TouchableOpacity>
       </View>
 
@@ -125,7 +132,7 @@ export default function HomeScreen() {
           <ActivityIndicator size="large" color="#3B82F6" />
         </View>
       ) : (
-        <ScrollView className="px-4">
+        <ScrollView className="px-1">
           {notes.length > 0 ? (
             notes.map(note => (
               <NoteCard
@@ -151,62 +158,11 @@ export default function HomeScreen() {
       )}
 
       {/* Floating Add Button */}
-      <Link href={"/pages/notetaking"} asChild>
-        <TouchableOpacity className="absolute bottom-8 right-6 bg-blue-500 p-4 rounded-full shadow-lg">
+      <Link href={"/pages/notetaking"} asChild className={"absolute bottom-0 right-0 p-4 m-4 bg-blue-500 rounded-full shadow-lg justify-center items-center"}>
+        <TouchableOpacity className="">
           <IconSymbol size={32} name="square.and.pencil" color="white" />
         </TouchableOpacity>
       </Link>
     </SafeAreaView>
   );
 }
-
-//   return (
-//     <SafeAreaView className={"flex h-screen-safe justify-center"}>
-//       <Modal
-//         isVisible={modalVisible}
-//         onBackdropPress={closeModal}
-//         style={{margin: 0}}
-//         className={"flex"}
-//       >
-//         <View className={"flex justify-start bg-white h-4/6 w-full rounded-lg p-10"}>
-//           <View >
-//             <Text>{noteName}</Text>
-//             <Text>{summaryText}</Text>
-//           </View>
-//         </View>
-//       </Modal>
-
-//       <View className={"flex flex-row justify-end items-center p-2 m-2"}>
-//         <TouchableOpacity onPress={switchEditing}>
-//           <Text className={"text-xl text-white"}>
-//             Edit
-//           </Text>
-//         </TouchableOpacity>
-//       </View>
-
-//       <ScrollView className={""}>
-//         {notes.map(
-//           note => (
-//             <NoteCard
-//               title={note.name}
-//               editing={editing}
-//               data={note.fileUrl}
-//               key={note.id}
-//               id={note.id}
-//               summary={note.summary}
-//               setNoteName={setNoteName}
-//               setSummaryText={setSummaryText}
-//               setModalVisible={setModalVisible}
-//               updateNotes={updateNotes}
-//             />
-//           )
-//         )}
-//       </ScrollView>
-//       <Link href={"/pages/notetaking"} className={"absolute bottom-20 right-0 p-10"}>
-//         <TouchableOpacity className={""}>
-//           <IconSymbol size={52} name={"square.and.pencil"} color={"white"}/>
-//         </TouchableOpacity>
-//       </Link>
-//     </SafeAreaView>
-//   );
-// }

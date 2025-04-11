@@ -14,7 +14,6 @@ export default function SignupScreen() {
   const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      Alert.alert("Success", "Account created!");
       router.replace("/");
     } catch (err: any) {
       setError(getFirebaseErrorMessage(err.code));

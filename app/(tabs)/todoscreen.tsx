@@ -77,7 +77,12 @@ export default function TodoScreen() {
         barStyle={"default"}
         hidden={false}
       />
-      <View className="mt-8 flex flex-row mx-4 h-16">
+
+      <View className="flex-row justify-start items-center p-4">
+        <Text className="text-3xl font-bold text-gray-800">My Todos</Text>
+      </View>
+
+      <View className="flex flex-row mx-4 h-16">
         <TextInput
           onChangeText={setNewTodoName}
           value={newTodoName}

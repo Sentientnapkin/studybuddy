@@ -23,7 +23,7 @@ import {Link, router, useLocalSearchParams} from "expo-router";
 import {IconSymbol} from "@/components/ui/IconSymbol";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
-import {doc, getFirestore, updateDoc} from "firebase/firestore";
+import {doc, getFirestore, setDoc, updateDoc} from "firebase/firestore";
 
 type IconRecord = {
   selected: boolean;
@@ -123,9 +123,10 @@ export default function NoteTakingScreen(props: IProps) {
           /** @type {any} */
           // console.log(result.data);
 
-          await updateDoc(noteRef, {
+          await setDoc(noteRef, {
             name: name,
-            fileUrl: (result.data as any[])[0]?.url,
+            // @ts-ignore
+            fileUrl: result.data[0].url,
           })
 
           router.push({pathname: "/(tabs)", params: {readyToUpdate: shouldUpdate}})
@@ -298,7 +299,12 @@ export default function NoteTakingScreen(props: IProps) {
 
   return (
     <SafeAreaView style={[styles.container, dark && styles.darkBack]}>
-      <StatusBar barStyle={!dark ? 'dark-content' : 'light-content'} />
+      <StatusBar
+        animated={true}
+        backgroundColor="#61dafb"
+        barStyle={"default"}
+        hidden={false}
+      />
       <InsertLinkModal
         placeholderColor={placeholderColor}
         color={color}

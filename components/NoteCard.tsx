@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import summarizeText from "@/scripts/summarizeText";
 import {getFunctions, httpsCallable} from "firebase/functions";
 import {getApp} from "firebase/app";
-import {Dispatch, SetStateAction} from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 
 interface TodoFormProps {
   title: string,
@@ -27,7 +27,8 @@ export default function NoteCard(props: TodoFormProps) {
   const app = getApp();
   const functions = getFunctions(app);
   const deleteNote = httpsCallable(functions, 'delete_note');
-  const hasBeenSummarized = props.summary == "";
+  const [hasBeenSummarized, setHasBeenSummarized] = useState(props.summary != "");
+  const [summary, setSummary] = useState("");
 
   const deleteItem = () => {
     deleteNote({id: props.id}).then(
@@ -55,11 +56,16 @@ export default function NoteCard(props: TodoFormProps) {
   }
 
   const summarizeNote = () => {
-    summarizeText(props.data, props.id).then(r => console.log(r))
+    summarizeText(props.data, props.id).then(r =>
+    {
+      console.log(r)
+      setSummary(r)
+      setHasBeenSummarized(true)
+    })
   }
 
   const viewSummary = () => {
-    props.setSummaryText(props.summary)
+    props.setSummaryText(summary)
     props.setNoteName(props.title)
     props.setModalVisible(true);
   }
@@ -73,7 +79,7 @@ export default function NoteCard(props: TodoFormProps) {
       </TouchableOpacity>
 
       {
-        hasBeenSummarized &&
+        !hasBeenSummarized &&
           <TouchableOpacity className={""} onPress={summarizeNote}>
               <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
           </TouchableOpacity>

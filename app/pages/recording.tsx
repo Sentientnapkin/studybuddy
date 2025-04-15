@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, SafeAreaView, Image, TextInput, Text} from 'react-native';
 import { Audio } from 'expo-av';
 import {IconSymbol} from "@/components/ui/IconSymbol";
@@ -6,7 +6,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import {getApp} from "firebase/app";
 import * as FileSystem from 'expo-file-system';
 import Modal from "react-native-modal";
-import {router, useLocalSearchParams} from "expo-router";
+import {Link, router, useLocalSearchParams} from "expo-router";
 
 
 export default function RecordingScreen() {
@@ -101,43 +101,100 @@ export default function RecordingScreen() {
   }, [isRecording])
 
   return(
-    <SafeAreaView className={"flex justify-center items-center bg-[#ecf0f1] p-10 h-screen-safe"}>
+    <SafeAreaView className={"flex-1 justify-center items-center bg-slate-700 "}>
+      {/* Save Recording Modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={hideModal}
-        className={"flex justify-center items-center"}
+        backdropOpacity={0.7}
+        animationIn="zoomIn"
+        animationOut="zoomOut"
       >
-        <View className={"flex justify-center items-center bg-white h-1/3 w-11/12 rounded-lg p-10"}>
+        <View className="bg-white rounded-2xl p-6 mx-4 mb-32">
+          <Text className="text-2xl font-bold text-slate-800 mb-4">Save Recording</Text>
+
+          <Text className="text-slate-600 mb-2">Recording Name</Text>
           <TextInput
             onChangeText={setName}
             value={name}
-            placeholder={"New Recording Name"}
-            placeholderTextColor={"#A9A9A9"}
-            className={"border-2 border-black p-8 m-2 rounded-md w-auto text-black"}
-          >
+            placeholder="Enter recording name..."
+            placeholderTextColor="#94a3b8"
+            className="border border-slate-300 rounded-lg px-4 py-3 mb-6
+                     text-slate-800 focus:border-blue-500"
+            autoFocus
+          />
 
-          </TextInput>
+          <View className="flex-row justify-between space-x-3">
+            <TouchableOpacity
+              onPress={hideModal}
+              className="px-6 py-3 rounded-lg bg-slate-100 active:bg-slate-200"
+            >
+              <Text className="text-slate-600 font-medium">Cancel</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={saveRecording} className={"flex justify-center items-center bg-green-700 h-12 w-full p-4 m-4 rounded-lg"}>
-            <Text className={"color-white"}>
-              Stop Recording
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={saveRecording}
+              className="px-6 py-3 rounded-lg bg-blue-500 active:bg-blue-600"
+            >
+              <Text className="text-white font-medium">Save Recording</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
 
-        <TouchableOpacity
-          onPress={isRecording ? stopRecording : startRecording}
-        >
-          {isRecording &&
-              <IconSymbol size={100} name="record.circle.fill" color={"red"} />
-          }
-
-          {!isRecording &&
-              <IconSymbol size={100} name="record.circle.fill" color={"black"} />
-          }
-
+      {/** Back Button **/}
+      <Link href={"/(tabs)/recordings"} className={"absolute top-12 left-0 p-4 m-4 bg-transparent justify-center items-center rounded-lg"}>
+        <TouchableOpacity className={"flex flex-row items-center justify-center"}>
+          <IconSymbol name={"chevron.backward"} color={"white"} size={32}/>
         </TouchableOpacity>
+      </Link>
+
+      {/* Main Content */}
+      <View className="flex-1 justify-center items-center">
+        {/* Status Indicator */}
+        <View className="mb-8">
+          <Text className="text-slate-100 text-lg font-semibold">
+            {isRecording ? 'Recording...' : 'Ready to Record'}
+          </Text>
+        </View>
+
+        {
+          isRecording &&
+            <TouchableOpacity
+                onPress={isRecording ? stopRecording : startRecording}
+                className={`w-32 h-32 rounded-full justify-center items-center 
+                bg-red-500 animate-pulse shadow-lg shadow-red-500/50`}
+                activeOpacity={0.8}
+            >
+                <IconSymbol
+                    size={64}
+                    name="record.circle.fill"
+                    color={'white'}
+                />
+            </TouchableOpacity>
+        }
+
+        {
+          !isRecording &&
+            <TouchableOpacity
+                onPress={isRecording ? stopRecording : startRecording}
+                className={`w-32 h-32 rounded-full justify-center items-center
+                bg-slate-100 shadow-lg shadow-slate-100/20`}
+                activeOpacity={0.8}
+            >
+                <IconSymbol
+                    size={64}
+                    name="record.circle.fill"
+                    color={'#ef4444'}
+                />
+            </TouchableOpacity>
+        }
+
+        {/* Helper Text */}
+        <Text className="text-slate-400 mt-6 text-center px-8">
+          {isRecording ? 'Tap to stop recording' : 'Tap the button above to start a new recording'}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }

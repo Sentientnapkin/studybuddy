@@ -1,6 +1,6 @@
 import { getApp } from 'firebase/app';
 import { getVertexAI, getGenerativeModel } from "firebase/vertexai";
-import {doc, updateDoc, getFirestore} from "firebase/firestore";
+import {doc, updateDoc, setDoc, getFirestore} from "firebase/firestore";
 
 export default async function transcribeRecording(fileUrl : string, id: string) {
   const app = getApp();
@@ -34,7 +34,7 @@ export default async function transcribeRecording(fileUrl : string, id: string) 
 
   const recording = doc(db, "audioRecordings", id);
 
-  await updateDoc(recording, {
+  await setDoc(recording, {
     transcription: result.response.text()
   })
 

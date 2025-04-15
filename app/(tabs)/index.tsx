@@ -107,13 +107,50 @@ export default function HomeScreen() {
       <Modal
         isVisible={modalVisible}
         onBackdropPress={closeModal}
-        style={{ margin: 0 }}
+        backdropOpacity={0.7}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        className="justify-end m-0"
       >
-        <View className="bg-white rounded-2xl p-6 mx-6 my-auto">
-          <Text className="text-2xl font-bold mb-4">{noteName}</Text>
-          <ScrollView>
-            <Text className="text-gray-700 text-base">{summaryText}</Text>
-          </ScrollView>
+        <View className="bg-white rounded-3xl pt-4 h-2/3">
+          {/* Modal Header */}
+          <View className="flex-row justify-between items-center px-6 pb-4 border-b border-slate-100">
+            <View className="flex-row items-center space-x-3">
+              <IconSymbol name="doc.text.fill" size={24} color="#3b82f6" />
+              <Text className="text-xl font-semibold text-slate-800 ml-2">Recording Details</Text>
+            </View>
+            <TouchableOpacity onPress={closeModal} className="p-2">
+              <IconSymbol name="xmark.circle.fill" size={24} color="#94a3b8" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Content Area */}
+          <View className="flex-1 px-6 py-5">
+            {/* Recording Name */}
+            <View className="mb-6">
+              <Text className="text-sm font-medium text-slate-500 mb-1">Title</Text>
+              <Text
+                className="text-lg text-slate-800 font-semibold"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {noteName.substring(0, noteName.length - 5)}
+              </Text>
+            </View>
+
+            {/* Transcription Section */}
+            <View className="flex-1">
+              <Text className="text-sm font-medium text-slate-500 mb-3">Transcription</Text>
+              <ScrollView
+                className="bg-slate-50 rounded-xl p-4"
+                showsVerticalScrollIndicator={false}
+              >
+                <Text className="text-slate-700 leading-6">
+                  {summaryText || "No transcription available"}
+                </Text>
+              </ScrollView>
+            </View>
+          </View>
         </View>
       </Modal>
 

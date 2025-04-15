@@ -1,6 +1,6 @@
 import { getApp } from 'firebase/app';
 import { getVertexAI, getGenerativeModel } from "firebase/vertexai";
-import {doc, updateDoc, getFirestore} from "firebase/firestore";
+import {doc, updateDoc, setDoc, getFirestore} from "firebase/firestore";
 
 export default async function summarizeText(noteToSummarize : string, id : string) {
   const app = getApp();
@@ -21,7 +21,7 @@ export default async function summarizeText(noteToSummarize : string, id : strin
 
   const note = doc(db, "notes", id);
 
-  await updateDoc(note, {
+  await setDoc(note, {
     summary: result.response.text()
   })
 

@@ -70,17 +70,53 @@ export default function RecordingsScreen() {
         barStyle={"default"}
         hidden={false}
       />
+
       <Modal
         isVisible={modalVisible}
         onBackdropPress={closeModal}
-        style={{margin: 0}}
-        className={"flex  "}
-
+        backdropOpacity={0.7}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        className="justify-end m-0"
       >
-        <View className={"flex justify-start bg-white h-4/6 w-full rounded-lg p-10"}>
-          <View >
-            <Text>{recordingName}</Text>
-            <Text>{transcriptionText}</Text>
+        <View className="bg-white rounded-3xl pt-4 h-2/3">
+          {/* Modal Header */}
+          <View className="flex-row justify-between items-center px-6 pb-4 border-b border-slate-100">
+            <View className="flex-row items-center space-x-3">
+              <IconSymbol name="doc.text.fill" size={24} color="#3b82f6" />
+              <Text className="text-xl font-semibold text-slate-800 ml-2">Recording Details</Text>
+            </View>
+            <TouchableOpacity onPress={closeModal} className="p-2">
+              <IconSymbol name="xmark.circle.fill" size={24} color="#94a3b8" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Content Area */}
+          <View className="flex-1 px-6 py-5">
+            {/* Recording Name */}
+            <View className="mb-6">
+              <Text className="text-sm font-medium text-slate-500 mb-1">Title</Text>
+              <Text
+                className="text-lg text-slate-800 font-semibold"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {recordingName.substring(0, recordingName.length - 4)}
+              </Text>
+            </View>
+
+            {/* Transcription Section */}
+            <View className="flex-1">
+              <Text className="text-sm font-medium text-slate-500 mb-3">Transcription</Text>
+              <ScrollView
+                className="bg-slate-50 rounded-xl p-4"
+                showsVerticalScrollIndicator={false}
+              >
+                <Text className="text-slate-700 leading-6">
+                  {transcriptionText || "No transcription available"}
+                </Text>
+              </ScrollView>
+            </View>
           </View>
         </View>
       </Modal>
@@ -109,9 +145,9 @@ export default function RecordingsScreen() {
           )
         )}
       </ScrollView>
-      <Link href={"/pages/recording"} className={"absolute bottom-0 right-0 p-4"}>
-        <TouchableOpacity className={""} onPress={() => {}}>
-          <IconSymbol size={60} name={"record.circle"} color={"red"}/>
+      <Link href={"/pages/recording"} className={"absolute bottom-0 right-0 p-4 m-4 bg-red-600 rounded-full shadow-lg justify-center items-center"}>
+        <TouchableOpacity className={""}>
+          <IconSymbol size={32} name={"microphone"} color={"white"}/>
         </TouchableOpacity>
       </Link>
     </SafeAreaView>

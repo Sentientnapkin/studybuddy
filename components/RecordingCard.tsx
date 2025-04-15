@@ -19,7 +19,8 @@ interface RecordingProps {
 }
 export default function RecordingCard(props : RecordingProps) {
   const [sound, setSound] = useState();
-  const hasBeenSummarized = props.transcription == "";
+  const [hasBeenSummarized, setHasBeenSummarized] = useState(props.transcription != "");
+  const [transcriptionText, setTranscriptionText] = useState("");
   const functions = getFunctions();
   const deleteRecording = httpsCallable(functions, 'delete_recording');
 
@@ -36,11 +37,15 @@ export default function RecordingCard(props : RecordingProps) {
   }
 
   const transcribe = () => {
-    transcribeRecording(props.fileUrl, props.id).then(r => console.log(r))
+    transcribeRecording(props.fileUrl, props.id).then(r => {
+      console.log(r)
+      setHasBeenSummarized(true)
+      setTranscriptionText(r)
+    })
   }
 
   const showTranscription = () => {
-    props.setTranscriptionText(props.transcription)
+    props.setTranscriptionText(transcriptionText)
     props.setRecordingName(props.name)
     props.setModalVisible(true);
   }
@@ -74,7 +79,7 @@ export default function RecordingCard(props : RecordingProps) {
       </TouchableOpacity>
 
       {
-        hasBeenSummarized &&
+        !hasBeenSummarized &&
           <TouchableOpacity className={""} onPress={transcribe}>
               <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
           </TouchableOpacity>

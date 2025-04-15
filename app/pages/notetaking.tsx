@@ -337,9 +337,9 @@ export default function NoteTakingScreen(props: IProps) {
               Save
             </Text>
           </TouchableOpacity>
-
-
         </View>
+
+
         <RichEditor
           // initialFocus={true}
           initialFocus={false}

@@ -95,6 +95,7 @@ def delete_note(req: https_fn.CallableRequest) -> Any:
         raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
                                   message="The function must be called while authenticated.")
 
+    uid = req.auth.uid
 
     document_id = req.data["id"]
 

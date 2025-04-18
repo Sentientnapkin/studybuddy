@@ -22,6 +22,7 @@ export default function RecordingCard(props : RecordingProps) {
   const [hasBeenSummarized, setHasBeenSummarized] = useState(props.transcription != "");
   const [transcriptionText, setTranscriptionText] = useState("");
   const functions = getFunctions();
+  const [deleting, setDeleting] = useState(false);
   const deleteRecording = httpsCallable(functions, 'delete_recording');
 
   async function playSound() {
@@ -51,6 +52,7 @@ export default function RecordingCard(props : RecordingProps) {
   }
 
   const deleteAudio = () => {
+    setDeleting(true);
     deleteRecording({id: props.id}).then(
       (response) => {
         console.log(response.data)
@@ -72,23 +74,39 @@ export default function RecordingCard(props : RecordingProps) {
   
   return (
     <View  className={"p-2 rounded-lg flex align-middle items-center flex-row justify-between bg-white drop-shadow-md m-2 h-20"}>
-      <TouchableOpacity onPress={playSound} onLongPress={showTranscription}>
-        <Text className={"p-2 text-xl font-bold text-black"}>
-          {props.name.substring(0, props.name.length - 4)}
-        </Text>
-      </TouchableOpacity>
-
       {
-        !hasBeenSummarized &&
-          <TouchableOpacity className={""} onPress={transcribe}>
-              <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
+        deleting
+          ?
+          (
+            <View className={"p-2"}>
+              <Text className={"text-lg"}>
+                Deleting...
+              </Text>
+            </View>
+          )
+          :
+          (
+          <TouchableOpacity onPress={playSound} onLongPress={showTranscription}>
+            <Text className={"p-2 text-xl font-bold text-black"}>
+              {props.name.substring(0, props.name.length - 4)}
+            </Text>
           </TouchableOpacity>
+          )
       }
-      {props.editing &&
-        <TouchableOpacity onPress={deleteAudio}>
-          <IconSymbol size={28} name={"trash.fill"} color={"black"}/>
-        </TouchableOpacity>
-      }
+
+      <View className={"p-2 flex flex-row"}>
+        {
+          !hasBeenSummarized &&
+            <TouchableOpacity className={`${props.editing ? 'mr-8' : ''}`} onPress={transcribe}>
+                <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
+            </TouchableOpacity>
+        }
+        {props.editing &&
+            <TouchableOpacity onPress={deleteAudio}>
+                <IconSymbol size={28} name={"trash.fill"} color={"black"}/>
+            </TouchableOpacity>
+        }
+      </View>
     </View>
   )
 }

@@ -8,19 +8,14 @@ import {
   Button,
   TouchableOpacity,
   TextInput,
-  Text, StatusBar
- } from 'react-native';
+  Text, StatusBar, ActivityIndicator
+} from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import Task from "@/components/Task";
 import Modal from "react-native-modal";
 import {getFunctions, httpsCallable} from "firebase/functions";
+import {useFocusEffect} from "expo-router";
 
 interface task {
   title: string,
@@ -36,6 +31,7 @@ export default function TodoScreen() {
   const [priority, setPriority] = useState("low") // setting priority
 
   const [changed, setChanged] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const functions = getFunctions();
   const getTodos = httpsCallable(functions, 'get_todos');
@@ -51,7 +47,8 @@ export default function TodoScreen() {
     addTodoFunction(newTodo)
       .then((result) => {
         // console.log(result.data)
-        setChanged(true)  
+
+        setChanged(true)
       })
 
     setNewTodoName("")
@@ -60,6 +57,7 @@ export default function TodoScreen() {
   }
 
   const updateTodos = () => {
+    setLoading(true)
     getTodos()
       .then((result) => {
         const data = result.data;
@@ -67,12 +65,20 @@ export default function TodoScreen() {
        // console.log(data[0].data);
        // @ts-ignore
         setTodos(data[0].data);
+      }).finally(() => {
+        setLoading(false)
         setChanged(false)
-      });
+    });
   }
 
+  useFocusEffect(
+    useCallback(() => {
+      updateTodos();
+    }, [])
+  )
+
   useEffect(() => {
-    updateTodos()  
+    updateTodos()
   }, [changed])
 
   return (
@@ -118,6 +124,12 @@ export default function TodoScreen() {
         </TouchableOpacity>
       </View>
 
+      {loading ? (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-lg text-gray-600 mb-4">Loading todos...</Text>
+          <ActivityIndicator size="large" color="#3B82F6" />
+        </View>
+      ) : (
       <ScrollView>
         {todos.map((item) => (
           <Task
@@ -130,6 +142,7 @@ export default function TodoScreen() {
           />
         ))}
       </ScrollView>
+      )}
     </SafeAreaView>
   );
 }

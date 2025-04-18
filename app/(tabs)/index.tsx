@@ -11,8 +11,8 @@ import {
   ActivityIndicator, StatusBar
 } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import {Link, useLocalSearchParams} from "expo-router";
-import {useEffect, useState} from "react";
+import {Link, useFocusEffect, useLocalSearchParams} from "expo-router";
+import {useCallback, useEffect, useState} from "react";
 import NoteCard from "@/components/NoteCard";
 import { getApp, initializeApp, getApps } from 'firebase/app';
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -90,6 +90,12 @@ export default function HomeScreen() {
 
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      updateNotes();
+    }, [])
+  )
+
   useEffect(() => {
     updateNotes()
   }, [readyToUpdate])
@@ -157,9 +163,14 @@ export default function HomeScreen() {
       {/* Top Bar */}
       <View className="flex-row justify-between items-center p-4">
         <Text className="text-3xl font-bold text-gray-800">My Notes</Text>
-        <TouchableOpacity onPress={switchEditing}>
-          <Text className="text-xl text-blue-600">{editing ? "Done" : "Edit"}</Text>
-        </TouchableOpacity>
+        <View className="flex flex-row">
+          <TouchableOpacity onPress={updateNotes} className="mr-4">
+            <IconSymbol name={"arrow.2.circlepath"} color={"blue"} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={switchEditing}>
+            <Text className="text-xl text-blue-600">{editing ? "Done" : "Edit"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Content Section */}

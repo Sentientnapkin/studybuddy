@@ -44,7 +44,7 @@ export default function RecordingScreen() {
 
     hideModal();
 
-    router.push({pathname: "/(tabs)/recordings", params: {readyToUpdate: shouldUpdate}})
+    router.navigate({pathname: "/(tabs)/recordings", params: {readyToUpdate: shouldUpdate}})
   }
 
   async function startRecording() {

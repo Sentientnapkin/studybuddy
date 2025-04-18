@@ -29,8 +29,10 @@ export default function NoteCard(props: TodoFormProps) {
   const deleteNote = httpsCallable(functions, 'delete_note');
   const [hasBeenSummarized, setHasBeenSummarized] = useState(props.summary != "");
   const [summary, setSummary] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const deleteItem = () => {
+    setDeleting(true);
     deleteNote({id: props.id}).then(
       (response) => {
         console.log(response.data)
@@ -72,23 +74,39 @@ export default function NoteCard(props: TodoFormProps) {
 
   return(
     <View  className={"p-2 rounded-lg flex align-middle items-center flex-row justify-between bg-white drop-shadow-md m-2 h-20"}>
-      <TouchableOpacity onPress={openNote} onLongPress={viewSummary}>
-        <Text className={"p-2 text-xl font-bold text-black"}>
-          {props.title.substring(0, props.title.length - 5)}
-        </Text>
-      </TouchableOpacity>
-
       {
-        !hasBeenSummarized &&
-          <TouchableOpacity className={""} onPress={summarizeNote}>
-              <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
+        deleting
+          ?
+          (
+            <View className={"p-2"}>
+              <Text className={"text-lg"}>
+                Deleting...
+              </Text>
+            </View>
+          )
+          :
+          (
+          <TouchableOpacity onPress={openNote} onLongPress={viewSummary}>
+            <Text className={"p-2 text-xl font-bold text-black"}>
+              {props.title.substring(0, props.title.length - 5)}
+            </Text>
           </TouchableOpacity>
+          )
       }
-      {props.editing &&
-          <TouchableOpacity onPress={deleteItem}>
-              <IconSymbol size={28} name={"trash.fill"} color={"red"}/>
-          </TouchableOpacity>
-      }
+
+      <View className={"p-2 flex flex-row"}>
+        {
+          !hasBeenSummarized &&
+            <TouchableOpacity className={`${props.editing ? 'mr-8' : ''}`} onPress={summarizeNote}>
+                <IconSymbol size={28} name={"list.clipboard"} color={"black"}/>
+            </TouchableOpacity>
+        }
+        {props.editing &&
+            <TouchableOpacity onPress={deleteItem}>
+                <IconSymbol size={28} name={"trash.fill"} color={"red"}/>
+            </TouchableOpacity>
+        }
+      </View>
     </View>
   );
 }

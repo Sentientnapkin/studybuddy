@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   TextInput,
   Text, StatusBar
-} from 'react-native';
+ } from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -26,12 +26,14 @@ interface task {
   title: string,
   description: string,
   id: string,
+  priority: string;  // Added for priority of tasks
 }
 
 export default function TodoScreen() {
   const [todos, setTodos] = useState<task[]>([])
   const [newTodoName, setNewTodoName] = useState("")
   const [newTodoDesc, setNewTodoDesc] = useState("")
+  const [priority, setPriority] = useState("low") // setting priority
 
   const [changed, setChanged] = useState(false)
 
@@ -40,17 +42,21 @@ export default function TodoScreen() {
   const addTodoFunction = httpsCallable(functions, 'add_todo');
 
   const addTodo = () => {
-    const newTodo = {name: newTodoName, description: newTodoDesc}
+    const newTodo = {
+      name: newTodoName,
+      description: newTodoDesc,
+      priority: priority,  // added priority to call (updated backend functions too)
+    }
 
     addTodoFunction(newTodo)
       .then((result) => {
         // console.log(result.data)
-
-        setChanged(true)
+        setChanged(true)  
       })
 
     setNewTodoName("")
     setNewTodoDesc("")
+    setPriority("low")  //priority change
   }
 
   const updateTodos = () => {
@@ -58,15 +64,15 @@ export default function TodoScreen() {
       .then((result) => {
         const data = result.data;
         // @ts-ignore
-        // console.log(data[0].data);
-        // @ts-ignore
+       // console.log(data[0].data);
+       // @ts-ignore
         setTodos(data[0].data);
         setChanged(false)
       });
   }
 
   useEffect(() => {
-    updateTodos()
+    updateTodos()  
   }, [changed])
 
   return (
@@ -92,22 +98,37 @@ export default function TodoScreen() {
         />
         <TouchableOpacity
           onPress={addTodo}
-          className="ml-2 border-2 border-green-700 p-2  hover:text-white hover:bg-green-500 rounded-lg flex flex-row items-center justify-center w-20"
+          className="ml-2 border-2 border-green-700 p-2 hover:text-white hover:bg-green-500 rounded-lg flex flex-row items-center justify-center w-20"
         >
           <Text className={"text-green-700"}>Add</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Priority Selector UI UPDATES */}
+      <View className="flex-row justify-start items-center mx-4">
+        <Text className="text-xl">Priority:</Text>
+        <TouchableOpacity onPress={() => setPriority("high")} style={{ backgroundColor: "red", padding: 5, margin: 5 }}>
+          <Text className="text-white">High</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setPriority("medium")} style={{ backgroundColor: "yellow", padding: 5, margin: 5 }}>
+          <Text className="text-black">Medium</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setPriority("low")} style={{ backgroundColor: "green", padding: 5, margin: 5 }}>
+          <Text className="text-white">Low</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView>
-        {todos.map(
-          (item) => (
-            <Task
-              name={item.title}
-              description={item.description}
-              key={item.id} id={item.id}
-              updateTodos={updateTodos}/>
-          )
-        )}
+        {todos.map((item) => (
+          <Task
+            key={item.id}
+            name={item.title}
+            description={item.description}
+            id={item.id}
+            priority={item.priority} // priority of task being sent to the task.tsx component
+            updateTodos={updateTodos}
+          />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );

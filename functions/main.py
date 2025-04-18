@@ -193,6 +193,8 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
     # JSON File Check
     title = req.data["name"]
     description = req.data["description"]
+    #added priority data pull
+    priority = req.data.get("priority", "low")
 
     if not title:
         return jsonify({"error": "Missing title or description"}), 400
@@ -201,7 +203,11 @@ def add_todo(req: https_fn.CallableRequest) -> Any:
     doc_ref = db.collection("users").document(uid).collection("todos").add({
         "title": title,
         "description": description,
+        #added priority
+        "priority": priority,
         "createdAt": firestore.SERVER_TIMESTAMP,
+        
+        
     })
 
     return {"success": True, "id": doc_ref[1].id}, 200

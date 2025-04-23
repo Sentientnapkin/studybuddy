@@ -60,29 +60,12 @@ export default function Task(props: TaskProps) {
               )
               :
               (
-              <View className="p-2">
-                <Text className={`text-lg text-black ${localChecked ? 'line-through' : ''}`}>{props.name}</Text>
-              </View>
+                <View className="p-2">
+                  <Text className={`text-lg text-black ${localChecked ? "line-through" : ""}`}>{props.name}</Text>
+                  <Text className={`text-sm text-${props.priority}`}>Priority: {props.priority}</Text>
+                </View>
               )
           }
-      <View className="p-2 ml-1">
-        <BouncyCheckbox
-          size={32}
-          iconImageStyle={{
-            width: 16,
-            height: 16,
-          }}
-          fillColor={"green"}
-          onPress={(checked: boolean) => {
-            setLocalChecked(!localChecked);
-          }}
-        />
-      </View>
-
-      <View className="p-2">
-        <Text className={`text-lg text-black ${localChecked ? "line-through" : ""}`}>{props.name}</Text>
-        <Text className={`text-sm text-${props.priority}`}>Priority: {props.priority}</Text>
-      </View>
 
           <TouchableOpacity onPress={finishTask} className="flex text-red-500 border-2 border-red-500 p-2 rounded-lg mr-2">
             <IconSymbol size={20} name={"xmark"} color={"red"}/>
